@@ -83,6 +83,7 @@ const Menuitems = [
       },
     ],
   },
+<<<<<<< HEAD
 =======
   // ✅ Thêm mục Quản lý sản phẩm
   {
@@ -124,6 +125,8 @@ const Menuitems = [
 },
 
 >>>>>>> 5483f35 (Quan ly san pham)
+=======
+>>>>>>> cdf9d17 (First commit)
   {
     id: uniqueId(),
     title: 'Tables',

@@ -16,6 +16,7 @@ const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 
 const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
 <<<<<<< HEAD
+<<<<<<< HEAD
 const User = lazy(() => import("../views/pages/Users/UserAdd"));
 const UserList = lazy(()=> import("../views/pages/Users/UserList"))
 const Contact = lazy(() => import("../views/pages/Contact/Contact"))
@@ -29,6 +30,11 @@ const ProductTrash = lazy(() => import("../views/product/ProductTrash"));
 const OrderList = lazy(() => import("../views/orders/OrderList"));
 const OrderDetail = lazy(() => import("../views/orders/OrderDetail"));
 >>>>>>> 5483f35 (Quan ly san pham)
+=======
+const User = lazy(() => import("../views/pages/Users/UserAdd"));
+const UserList = lazy(()=> import("../views/pages/Users/UserList"))
+const Contact = lazy(() => import("../views/pages/Contact/Contact"))
+>>>>>>> cdf9d17 (First commit)
 const Router = [
   {
     path: '/',
@@ -39,6 +45,7 @@ const Router = [
 
       { path: "/tables/basic-table", element: <BasicTable /> },
       { path: "/form-layouts", element: <FormLayouts /> },
+<<<<<<< HEAD
 <<<<<<< HEAD
       { path: "/users/useradd", element: <User /> },
       { path: "/users/userlist", element: <UserList /> },
@@ -52,6 +59,11 @@ const Router = [
   { path: '/orders', element: <OrderList /> },
       { path: '/orders/:id', element: <OrderDetail /> },
 >>>>>>> 5483f35 (Quan ly san pham)
+=======
+      { path: "/users/useradd", element: <User /> },
+      { path: "/users/userlist", element: <UserList /> },
+      { path: "/contact/contact", element: <Contact /> },
+>>>>>>> cdf9d17 (First commit)
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
