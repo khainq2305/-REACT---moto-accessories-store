@@ -52,7 +52,7 @@ const products = [
 
 const ProductPerformance = () => {
 
-    // select
+
     const [month, setMonth] = React.useState('1');
 
     const handleChange = (event) => {
@@ -61,7 +61,7 @@ const ProductPerformance = () => {
 
     return (
 
-        <DashboardCard title="Product Performance" action={
+        <DashboardCard title="Product xxxx" action={
             <Select
                 labelId="month-dd"
                 id="month-dd"
@@ -163,7 +163,7 @@ const ProductPerformance = () => {
                                     ></Chip>
                                 </TableCell>
                                 <TableCell align="right">
-                                    <Typography variant="h6">${product.budget}k</Typography>
+                                    <Typography variant="h6">${product.budget}kv</Typography>
                                 </TableCell>
                             </TableRow>
                         ))}

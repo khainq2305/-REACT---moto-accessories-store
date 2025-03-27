@@ -14,7 +14,8 @@ import {
   IconFileCheck,
 
    IconTable, 
-  IconForms
+  IconForms,
+  IconPackage
 } from '@tabler/icons-react';
 
 
@@ -37,8 +38,50 @@ const Menuitems = [
   
 
   
- 
-
+  {
+    navlabel: true,
+    subheader: 'Apps',
+  },
+  {
+    id: uniqueId(),
+    title: 'Người dùng',
+    icon: IconUserCircle,
+    href: 'https://modernize-react.adminmart.com/apps/ecommerce/',
+    chip: 'Pro',
+    children: [
+     
+    
+     
+      {
+        id: uniqueId(),
+        title: 'Danh sách',
+        icon: IconPoint,
+        href: '/Users/userlist',
+      },
+      {
+        id: uniqueId(),
+        title: 'Thêm Người Dùng',
+        icon: IconPoint,
+        href: '/Users/useradd',
+      },
+    ],
+  },
+  {
+    id: uniqueId(),
+    title: 'Liên hệ',
+    icon: IconPackage,
+    href: 'https://modernize-react.adminmart.com/apps/ecommerce/',
+    chip: 'Pro',
+    children: [
+     
+      {
+        id: uniqueId(),
+        title: 'Danh sách',
+        icon: IconPoint,
+        href: '/contact/contact',
+      },
+    ],
+  },
   {
     id: uniqueId(),
     title: 'Tables',
@@ -57,34 +100,7 @@ const Menuitems = [
     subheader: 'Apps',
   },
   
-  {
-    id: uniqueId(),
-    title: 'Ecommerce',
-    icon: IconBasket,
-    href: 'https://modernize-react.adminmart.com/apps/ecommerce/',
-    chip: 'Pro',
-    children: [
-     
-    
-     
-      {
-        id: uniqueId(),
-        title: 'Add Product',
-        icon: IconPoint,
-        href: 'https://modernize-react.adminmart.com/apps/ecommerce/add-product',
-
-        chip: 'Pro',
-      },
-      {
-        id: uniqueId(),
-        title: 'Edit Product',
-        icon: IconPoint,
-        href: 'https://modernize-react.adminmart.com/apps/ecommerce/edit-product',
-
-        chip: 'Pro',
-      },
-    ],
-  },
+  
   {
     id: uniqueId(),
     title: 'Invoice',

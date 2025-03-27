@@ -1,0 +1,70 @@
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    padding-left: 20px;
+  }
+  
+  .status-indicator::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  
+  .status-indicator.in-stock::before {
+    background-color: #00d084;
+  }
+  
+  .status-indicator.out-of-stock::before {
+    background-color: #ff6b6b;
+  }
+  
+  .table th {
+    font-weight: 600;
+    border-top: none;
+  }
+  
+  .table td {
+    vertical-align: middle;
+  }
+  
+  .input-group {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .input-group-text {
+    border-right: none;
+  }
+  
+  .form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+  }
+  
+  .btn-outline-secondary {
+    border-color: #ced4da;
+  }
+  
+  .btn-outline-secondary:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+  }
+  
+  .card {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-img img {
+    object-fit: cover;
+  }
+  
+  

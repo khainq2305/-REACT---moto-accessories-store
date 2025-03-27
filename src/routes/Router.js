@@ -15,7 +15,9 @@ const Login = lazy(() => import('../views/authentication/Login'));
 const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 
 const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
-
+const User = lazy(() => import("../views/pages/Users/UserAdd"));
+const UserList = lazy(()=> import("../views/pages/Users/UserList"))
+const Contact = lazy(() => import("../views/pages/Contact/Contact"))
 const Router = [
   {
     path: '/',
@@ -26,8 +28,9 @@ const Router = [
 
       { path: "/tables/basic-table", element: <BasicTable /> },
       { path: "/form-layouts", element: <FormLayouts /> },
-  
-
+      { path: "/users/useradd", element: <User /> },
+      { path: "/users/userlist", element: <UserList /> },
+      { path: "/contact/contact", element: <Contact /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
