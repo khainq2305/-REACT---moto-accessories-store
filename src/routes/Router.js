@@ -15,34 +15,21 @@ const Login = lazy(() => import("../views/authentication/Login"));
 const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 
 const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-const User = lazy(() => import("../views/pages/Users/UserAdd"));
-const UserList = lazy(()=> import("../views/pages/Users/UserList"))
-const Contact = lazy(() => import("../views/pages/Contact/Contact"))
-=======
-=======
->>>>>>> 5483f35 (Quan ly san pham)
+
 /* ✅ Import Product Pages */
 const ProductList = lazy(() => import("../views/product/ProductList.js"));
 
-<<<<<<< HEAD
+
 const ProductAdd = lazy(() => import("../views/product/ProductAdd"));
 const ProductEdit = lazy(() => import("../views/product/ProductAdd")); // Dùng chung với form thêm
 const ProductTrash = lazy(() => import("../views/product/ProductTrash"));
 const OrderList = lazy(() => import("../views/orders/OrderList"));
 const OrderDetail = lazy(() => import("../views/orders/OrderDetail"));
-<<<<<<< HEAD
->>>>>>> 5483f35 (Quan ly san pham)
-=======
+
 const User = lazy(() => import("../views/pages/Users/UserAdd"));
 const UserList = lazy(()=> import("../views/pages/Users/UserList"))
 const Contact = lazy(() => import("../views/pages/Contact/Contact"))
->>>>>>> cdf9d17 (First commit)
-=======
->>>>>>> 5483f35 (Quan ly san pham)
-=======
+
 const CategoryPage = lazy(() => import("../views/category/CategoryPage"));
 const CategoryList = lazy(() => import("../views/category/CategoryList"));
 const CategoryForm = lazy(() => import("../views/category/Category-add"));
@@ -52,7 +39,7 @@ const CommentList = lazy(() => import("../views/comment/CommentList"));
 const CommentDetail = lazy(() => import("../views/comment/CommentDetail"));
 const CommentPage = lazy(() => import("../views/comment/CommentPage")); 
 
->>>>>>> c35abda ([ADMIN-UI] - Add UI components for Category)
+
 const Router = [
   {
     path: "/",
@@ -62,16 +49,11 @@ const Router = [
       { path: "/dashboard", exact: true, element: <Dashboard /> },
       { path: "/tables/basic-table", element: <BasicTable /> },
       { path: "/form-layouts", element: <FormLayouts /> },
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
       { path: "/users/useradd", element: <User /> },
       { path: "/users/userlist", element: <UserList /> },
       { path: "/contact/contact", element: <Contact /> },
-=======
-=======
->>>>>>> 5483f35 (Quan ly san pham)
+
   // ✅ Sửa lỗi: Chỉ cần thêm routes sản phẩm vào đây
   { path: "/products", element: <ProductList /> }, 
   { path: "/products/add", element: <ProductAdd /> },
@@ -79,17 +61,10 @@ const Router = [
   { path: '/products/trash', element: <ProductTrash /> },
   { path: '/orders', element: <OrderList /> },
       { path: '/orders/:id', element: <OrderDetail /> },
-<<<<<<< HEAD
->>>>>>> 5483f35 (Quan ly san pham)
-=======
-      { path: "/users/useradd", element: <User /> },
-      { path: "/users/userlist", element: <UserList /> },
-      { path: "/contact/contact", element: <Contact /> },
->>>>>>> cdf9d17 (First commit)
-=======
->>>>>>> 5483f35 (Quan ly san pham)
+
+    
+
       { path: '*', element: <Navigate to="/auth/404" /> },
-=======
 
       {
         path: "/category",
@@ -111,7 +86,7 @@ const Router = [
         ],
       },
 
->>>>>>> c35abda ([ADMIN-UI] - Add UI components for Category)
+
     ],
   },
   
