@@ -15,9 +15,20 @@ const Login = lazy(() => import('../views/authentication/Login'));
 const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 
 const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
+<<<<<<< HEAD
 const User = lazy(() => import("../views/pages/Users/UserAdd"));
 const UserList = lazy(()=> import("../views/pages/Users/UserList"))
 const Contact = lazy(() => import("../views/pages/Contact/Contact"))
+=======
+/* ✅ Import Product Pages */
+const ProductList = lazy(() => import("../views/product/ProductList.js"));
+
+const ProductAdd = lazy(() => import("../views/product/ProductAdd"));
+const ProductEdit = lazy(() => import("../views/product/ProductAdd")); // Dùng chung với form thêm
+const ProductTrash = lazy(() => import("../views/product/ProductTrash"));
+const OrderList = lazy(() => import("../views/orders/OrderList"));
+const OrderDetail = lazy(() => import("../views/orders/OrderDetail"));
+>>>>>>> 5483f35 (Quan ly san pham)
 const Router = [
   {
     path: '/',
@@ -28,12 +39,23 @@ const Router = [
 
       { path: "/tables/basic-table", element: <BasicTable /> },
       { path: "/form-layouts", element: <FormLayouts /> },
+<<<<<<< HEAD
       { path: "/users/useradd", element: <User /> },
       { path: "/users/userlist", element: <UserList /> },
       { path: "/contact/contact", element: <Contact /> },
+=======
+  // ✅ Sửa lỗi: Chỉ cần thêm routes sản phẩm vào đây
+  { path: "/products", element: <ProductList /> }, 
+  { path: "/products/add", element: <ProductAdd /> },
+  { path: "/products/edit/:id", element: <ProductEdit /> }, // thêm route edit
+  { path: '/products/trash', element: <ProductTrash /> },
+  { path: '/orders', element: <OrderList /> },
+      { path: '/orders/:id', element: <OrderDetail /> },
+>>>>>>> 5483f35 (Quan ly san pham)
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
+  
   {
     path: '/auth',
     element: <BlankLayout />,

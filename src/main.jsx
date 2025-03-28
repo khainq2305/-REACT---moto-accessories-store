@@ -1,14 +1,14 @@
-// import React from 'react'
-// import ReactDOM from 'react-dom/client'
-// import App from './App.jsx'
-// import './index.css'
 
-import React, { Suspense } from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import { SnackbarProvider } from "notistack";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <Suspense>
-      <App />
-  </Suspense>,
-)
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <SnackbarProvider
+    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    autoHideDuration={3000}
+    maxSnack={3}
+  >
+    <App />
+  </SnackbarProvider>
+);

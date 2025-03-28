@@ -17,7 +17,7 @@ const Sidebar = (props) => {
           open={props.isSidebarOpen}
           variant="permanent"
           PaperProps={{
-            sx: { width: sidebarWidth, boxSizing: 'border-box', top: '64px' },
+            sx: { width: sidebarWidth, boxSizing: 'border-box' },
           }}
         >
           {/* Sidebar Items */}

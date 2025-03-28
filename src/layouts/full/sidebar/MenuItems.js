@@ -3,10 +3,10 @@ import { uniqueId } from 'lodash';
 
 import {
    IconLayoutDashboard,
-
+   IconPackage,
   IconPoint,
   IconUserCircle,
-  
+  IconShoppingCart,
   IconBasket,
   
   IconLogin,
@@ -37,6 +37,7 @@ const Menuitems = [
   },
   
 
+<<<<<<< HEAD
   
   {
     navlabel: true,
@@ -82,6 +83,47 @@ const Menuitems = [
       },
     ],
   },
+=======
+  // ✅ Thêm mục Quản lý sản phẩm
+  {
+    id: uniqueId(),
+    title: 'Quản lý sản phẩm',
+    icon: IconPackage, // Icon cho sản phẩm
+    href: null,
+    
+    children: [
+      {
+        id: uniqueId(),
+        title: "Danh sách sản phẩm",
+        icon: IconPoint,
+        href: "/products", // ✅ Đúng đường dẫn
+      },
+      
+      {
+        id: uniqueId(),
+        title: 'Thêm mới sản phẩm',
+        icon: IconPoint,
+        href: '/products/add',
+      },
+    ],
+  },
+
+{
+  id: uniqueId(),
+  title: 'Quản lý đơn hàng',
+  icon: IconShoppingCart, // Icon cho sản phẩm
+  href: '#',
+  children: [
+    {
+      id: uniqueId(),
+      title: "Danh sách đơn hàng",
+      icon: IconPoint,
+      href: "/orders", 
+    },
+  ],
+},
+
+>>>>>>> 5483f35 (Quan ly san pham)
   {
     id: uniqueId(),
     title: 'Tables',
