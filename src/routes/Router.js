@@ -17,10 +17,13 @@ const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const User = lazy(() => import("../views/pages/Users/UserAdd"));
 const UserList = lazy(()=> import("../views/pages/Users/UserList"))
 const Contact = lazy(() => import("../views/pages/Contact/Contact"))
 =======
+=======
+>>>>>>> 5483f35 (Quan ly san pham)
 /* ✅ Import Product Pages */
 const ProductList = lazy(() => import("../views/product/ProductList.js"));
 
@@ -29,12 +32,15 @@ const ProductEdit = lazy(() => import("../views/product/ProductAdd")); // Dùng 
 const ProductTrash = lazy(() => import("../views/product/ProductTrash"));
 const OrderList = lazy(() => import("../views/orders/OrderList"));
 const OrderDetail = lazy(() => import("../views/orders/OrderDetail"));
+<<<<<<< HEAD
 >>>>>>> 5483f35 (Quan ly san pham)
 =======
 const User = lazy(() => import("../views/pages/Users/UserAdd"));
 const UserList = lazy(()=> import("../views/pages/Users/UserList"))
 const Contact = lazy(() => import("../views/pages/Contact/Contact"))
 >>>>>>> cdf9d17 (First commit)
+=======
+>>>>>>> 5483f35 (Quan ly san pham)
 const Router = [
   {
     path: '/',
@@ -47,10 +53,13 @@ const Router = [
       { path: "/form-layouts", element: <FormLayouts /> },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       { path: "/users/useradd", element: <User /> },
       { path: "/users/userlist", element: <UserList /> },
       { path: "/contact/contact", element: <Contact /> },
 =======
+=======
+>>>>>>> 5483f35 (Quan ly san pham)
   // ✅ Sửa lỗi: Chỉ cần thêm routes sản phẩm vào đây
   { path: "/products", element: <ProductList /> }, 
   { path: "/products/add", element: <ProductAdd /> },
@@ -58,12 +67,15 @@ const Router = [
   { path: '/products/trash', element: <ProductTrash /> },
   { path: '/orders', element: <OrderList /> },
       { path: '/orders/:id', element: <OrderDetail /> },
+<<<<<<< HEAD
 >>>>>>> 5483f35 (Quan ly san pham)
 =======
       { path: "/users/useradd", element: <User /> },
       { path: "/users/userlist", element: <UserList /> },
       { path: "/contact/contact", element: <Contact /> },
 >>>>>>> cdf9d17 (First commit)
+=======
+>>>>>>> 5483f35 (Quan ly san pham)
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

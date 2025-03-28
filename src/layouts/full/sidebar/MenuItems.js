@@ -38,6 +38,7 @@ const Menuitems = [
   
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   
   {
     navlabel: true,
@@ -85,6 +86,8 @@ const Menuitems = [
   },
 <<<<<<< HEAD
 =======
+=======
+>>>>>>> 5483f35 (Quan ly san pham)
   // ✅ Thêm mục Quản lý sản phẩm
   {
     id: uniqueId(),
@@ -108,6 +111,24 @@ const Menuitems = [
       },
     ],
   },
+<<<<<<< HEAD
+=======
+
+{
+  id: uniqueId(),
+  title: 'Quản lý đơn hàng',
+  icon: IconShoppingCart, // Icon cho sản phẩm
+  href: '#',
+  children: [
+    {
+      id: uniqueId(),
+      title: "Danh sách đơn hàng",
+      icon: IconPoint,
+      href: "/orders", 
+    },
+  ],
+},
+>>>>>>> 5483f35 (Quan ly san pham)
 
 {
   id: uniqueId(),
