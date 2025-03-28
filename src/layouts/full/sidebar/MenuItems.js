@@ -1,6 +1,7 @@
 
 import { uniqueId } from 'lodash';
 
+
 import {
    IconLayoutDashboard,
    IconPackage,
@@ -15,7 +16,12 @@ import {
 
    IconTable, 
   IconForms,
+<<<<<<< HEAD
   IconPackage
+=======
+  IconListDetails,
+  IconMessage2 
+>>>>>>> c35abda ([ADMIN-UI] - Add UI components for Category)
 } from '@tabler/icons-react';
 
 
@@ -35,8 +41,28 @@ const Menuitems = [
     navlabel: true,
     subheader: 'Utilities',
   },
-  
+  {
+    id: uniqueId(),
+    title: 'Quản lý loại danh mục',
+    icon: IconListDetails,
+    href: '/category',
+    children: [
+      {
+        id: uniqueId(),
+        title: 'Danh sách',
+        icon: IconPoint,
+        href: '/category',
+      },
+      {
+        id: uniqueId(),
+        title: 'Thêm mới',
+        icon: IconPoint,
+        href: '/category/create',
+      }
+    ]
+  },
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   
@@ -54,10 +80,19 @@ const Menuitems = [
      
     
      
+=======
+  {
+    id: uniqueId(),
+    title: 'Quản lý bình luận',
+    icon: IconMessage2,
+    href: '/comment',
+    children: [
+>>>>>>> c35abda ([ADMIN-UI] - Add UI components for Category)
       {
         id: uniqueId(),
         title: 'Danh sách',
         icon: IconPoint,
+<<<<<<< HEAD
         href: '/Users/userlist',
       },
       {
@@ -113,6 +148,12 @@ const Menuitems = [
   },
 <<<<<<< HEAD
 =======
+=======
+        href: '/comment'
+      }
+    ]
+  },
+>>>>>>> c35abda ([ADMIN-UI] - Add UI components for Category)
 
 {
   id: uniqueId(),
@@ -209,6 +250,9 @@ const Menuitems = [
     ],
   },
 
+
+  
+  
   
   
   
