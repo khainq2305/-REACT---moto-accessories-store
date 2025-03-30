@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Avatar, Chip, IconButton, Menu, MenuItem, TextField, Select, MenuItem as MuiMenuItem, Pagination } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Chip, IconButton, Menu, MenuItem, TextField, Select, MenuItem as MuiMenuItem, Pagination } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -19,8 +19,8 @@ const ProductList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [products, setProducts] = useState([
-    { id: 1, name: "Đĩa KingSpeed 260mm", price: 2500000, discountPrice: 2200000, category: "Đĩa xe máy", quantity: 15, status: "Còn hàng", image: "/images/disc-brake.jpg" },
-    { id: 2, name: "Phuộc xe máy", price: 500000, discountPrice: 450000, category: "Phuộc xe máy", quantity: 30, status: "Hết hàng", image: "/images/shock-absorber.jpg" },
+    { id: 1, name: "Đĩa KingSpeed 260mm", price: 2500000, discountPrice: 2200000, category: "Đĩa xe máy", quantity: 15, status: "Còn hàng", image: "https://shop2banh.vn/images/thumbs/2022/04/che-ket-nuoc-cnc-anode-cho-honda-shvn-2020-products-1727.jpg" },
+    { id: 2, name: "Phuộc xe máy", price: 500000, discountPrice: 450000, category: "Phuộc xe máy", quantity: 30, status: "Hết hàng", image: "https://shop2banh.vn/images/thumbs/2024/10/tay-thang-gh-racing-cnc-cho-honda-sh-products-2337.jpg" },
   ]);
 const [fromDate, setFromDate] = useState(null);
 
@@ -122,7 +122,8 @@ const [fromDate, setFromDate] = useState(null);
   variant="contained"
   color="error"
   startIcon={<DeleteOutlineIcon />}
-  onClick={() => navigate("/products/trash")}
+  onClick={() => navigate("/admin/products/trash")}
+
 >
   Thùng rác
 </Button>
@@ -146,7 +147,20 @@ const [fromDate, setFromDate] = useState(null);
             {products.map((product, index) => (
               <TableRow key={product.id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell><Avatar src={product.image} alt={product.name} sx={{ width: 56, height: 56 }} /></TableCell>
+                <TableCell>
+  <img
+    src={product.image}
+    alt={product.name}
+    style={{
+      width: 60,
+      height: 60,
+      objectFit: 'cover',
+      borderRadius: 8, // 👈 nếu muốn bo góc nhẹ
+      border: '1px solid #eee'
+    }}
+  />
+</TableCell>
+
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.price.toLocaleString()} VND</TableCell>
                 <TableCell>{product.discountPrice.toLocaleString()} VND</TableCell>
@@ -170,7 +184,7 @@ const [fromDate, setFromDate] = useState(null);
       </div>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
   <MenuItem
-    onClick={() => navigate(`/products/edit/${selectedProduct?.id}`)}
+    onClick={() => navigate(`/admin/products/edit/${selectedProduct?.id}`)}
     sx={{
       display: 'flex',
       alignItems: 'center',

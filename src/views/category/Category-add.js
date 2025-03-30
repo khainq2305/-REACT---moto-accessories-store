@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Card, CardHeader, CardContent, TextField, Typography, Button,
   Select, MenuItem, InputLabel, FormControl, IconButton, Box
@@ -7,7 +7,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
 import useToast from '../../components/Toast';
-
+import TinyEditor from '../../components/EDITOR/TinyEditor';
 const CategoryAdd = () => {
   const toast = useToast();
   const fileInputRef = useRef();
@@ -18,7 +18,7 @@ const CategoryAdd = () => {
     handleSubmit,
     control,
     setValue,
-    watch,
+
     reset
   } = useForm({
     defaultValues: {
@@ -29,7 +29,7 @@ const CategoryAdd = () => {
     }
   });
 
-  const imageWatch = watch('image');
+
 
   const onSubmit = (data) => {
     console.log(data);
@@ -171,15 +171,10 @@ const CategoryAdd = () => {
               name="description"
               control={control}
               render={({ field }) => (
-                <TextField
-                  {...field}
-                  placeholder="Mô tả danh mục..."
-                  multiline
-                  rows={4}
-                  fullWidth
-                />
+                <TinyEditor value={field.value} onChange={field.onChange} />
               )}
             />
+
           </Box>
 
           <Box mt={3} display="flex" gap={2}>

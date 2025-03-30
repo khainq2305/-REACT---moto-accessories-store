@@ -3,18 +3,14 @@ import { createBrowserRouter, Navigate } from "react-router";
 
 /* ***Layouts**** */
 const FullLayout = lazy(() => import("../layouts/full/FullLayout"));
-const BlankLayout = lazy(() => import("../layouts/blank/BlankLayout"));
 
 /* ****Pages***** */
 const Dashboard = lazy(() => import("../views/dashboard/Dashboard"));
 
-const Error = lazy(() => import("../views/authentication/Error"));
-const Register = lazy(() => import("../views/authentication/Register"));
-const Login = lazy(() => import("../views/authentication/Login"));
 
-const BasicTable = lazy(() => import("../views/tables/BasicTable"));
 
-const FormLayouts = lazy(() => import("../views/form-layouts/FormLayouts"));
+
+
 
 /* ✅ Import Product Pages */
 const ProductList = lazy(() => import("../views/product/ProductList.js"));
@@ -42,32 +38,24 @@ const CommentPage = lazy(() => import("../views/comment/CommentPage"));
 
 const Router = [
   {
-    path: "/",
+    path: "/admin",
     element: <FullLayout />,
     children: [
-      { path: "/", element: <Navigate to="/dashboard" /> },
-      { path: "/dashboard", exact: true, element: <Dashboard /> },
-      { path: "/tables/basic-table", element: <BasicTable /> },
-      { path: "/form-layouts", element: <FormLayouts /> },
+      { path: "", element: <Navigate to="dashboard" /> },
+      { path: "dashboard", element: <Dashboard /> },
+      { path: "users/useradd", element: <User /> },
+      { path: "users/userlist", element: <UserList /> },
+      { path: "contact/contact", element: <Contact /> },
 
-      { path: "/users/useradd", element: <User /> },
-      { path: "/users/userlist", element: <UserList /> },
-      { path: "/contact/contact", element: <Contact /> },
-
-  // ✅ Sửa lỗi: Chỉ cần thêm routes sản phẩm vào đây
-  { path: "/products", element: <ProductList /> }, 
-  { path: "/products/add", element: <ProductAdd /> },
-  { path: "/products/edit/:id", element: <ProductEdit /> }, // thêm route edit
-  { path: '/products/trash', element: <ProductTrash /> },
-  { path: '/orders', element: <OrderList /> },
-      { path: '/orders/:id', element: <OrderDetail /> },
-
-    
-
-      { path: '*', element: <Navigate to="/auth/404" /> },
+      { path: "products", element: <ProductList /> },
+      { path: "products/add", element: <ProductAdd /> },
+      { path: "products/edit/:id", element: <ProductEdit /> },
+      { path: "products/trash", element: <ProductTrash /> },
+      { path: "orders", element: <OrderList /> },
+      { path: "orders/:id", element: <OrderDetail /> },
 
       {
-        path: "/category",
+        path: "category",
         element: <CategoryPage />,
         children: [
           { path: "", element: <CategoryList /> },
@@ -78,28 +66,19 @@ const Router = [
       },
 
       {
-        path: "/comment",
-        element: <CommentPage />, // Dùng Outlet ở đây
+        path: "comment",
+        element: <CommentPage />,
         children: [
           { path: "", element: <CommentList /> },
-          { path: ":productId", element: <CommentDetail /> }, // ✅ Sửa path
+          { path: ":productId", element: <CommentDetail /> },
         ],
       },
 
-
+      { path: "*", element: <Navigate to="/admin/dashboard" /> },
     ],
   },
   
-  {
-    path: "/auth",
-    element: <BlankLayout />,
-    children: [
-      { path: "404", element: <Error /> },
-      { path: "/auth/register", element: <Register /> },
-      { path: "/auth/login", element: <Login /> },
-      { path: "*", element: <Navigate to="/auth/404" /> },
-    ],
-  },
+ 
 ];
 
 const router = createBrowserRouter(Router);

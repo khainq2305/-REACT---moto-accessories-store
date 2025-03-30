@@ -17,7 +17,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
 import useToast from "../../components/Toast";
-
+import TinyEditor from "../../components/EDITOR/TinyEditor";
 const ProductAdd = () => {
   const toast = useToast();
   const { register, handleSubmit, control } = useForm();
@@ -60,8 +60,6 @@ const ProductAdd = () => {
     setProductImages((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  
-
   const handleAddCategory = () => {
     const trimmed = newCategory.trim();
     if (trimmed && !categories.includes(trimmed)) {
@@ -78,15 +76,28 @@ const ProductAdd = () => {
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
             <Box sx={{ mb: 3 }}>
-              <h3>Thông tin chung</h3>
-              <TextField fullWidth label="Tên sản phẩm" placeholder="Nhập tên sản phẩm" {...register("productName")} sx={{ mt: 2 }} />
+              <Typography variant="h6" fontWeight={600} mb={2}>Thông tin chung</Typography>
+              <TextField fullWidth label="Tên sản phẩm" placeholder="Nhập tên sản phẩm" {...register("productName")} />
             </Box>
-
             <Box sx={{ mb: 3 }}>
-              <h3>Giá cả</h3>
+              <Typography variant="subtitle1" fontWeight={500} mb={1}>Mô tả sản phẩm</Typography>
+              <Controller
+                name="description"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TinyEditor
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              />
+            </Box>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" fontWeight={600} mb={2}>Giá cả</Typography>
               <TextField fullWidth label="Giá gốc" type="number" placeholder="Nhập giá sản phẩm" {...register("originalPrice")} />
 
-              <h4>Loại giảm giá</h4>
+              <Typography variant="subtitle1" fontWeight={500} mt={2}>Loại giảm giá</Typography>
               <RadioGroup row value={discountType} onChange={(e) => { setDiscountType(e.target.value); setDiscountValue(0); }}>
                 <FormControlLabel value="không giảm giá" control={<Radio />} label="Không giảm giá" />
                 <FormControlLabel value="giảm theo %" control={<Radio />} label="Phần trăm %" />
@@ -114,7 +125,7 @@ const ProductAdd = () => {
             </Box>
 
             <Box sx={{ mb: 3 }}>
-              <h3>Hình ảnh sản phẩm</h3>
+              <Typography variant="h6" fontWeight={600} mb={2}>Hình ảnh sản phẩm</Typography>
               <Box
                 component="label"
                 htmlFor="product-images"
@@ -140,7 +151,7 @@ const ProductAdd = () => {
 
               {productImages.length > 0 && (
                 <Box sx={{ mt: 2 }}>
-                  <h4>Tập tin:</h4>
+                  <Typography variant="subtitle1" fontWeight={500}>Tập tin:</Typography>
                   {productImages.map((img, index) => (
                     <Box key={index} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff", border: "1px solid #eee", borderRadius: 2, px: 2, py: 1, mb: 1 }}>
                       <Box sx={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
@@ -161,7 +172,7 @@ const ProductAdd = () => {
 
           <Grid item xs={12} md={4}>
             <Box sx={{ mb: 3 }}>
-              <h3>Ảnh đại diện</h3>
+              <Typography variant="h6" fontWeight={600} mb={2}>Ảnh đại diện</Typography>
               <FormControl fullWidth>
                 <Controller
                   name="thumbnail"
@@ -212,7 +223,7 @@ const ProductAdd = () => {
             </Box>
 
             <Box sx={{ mb: 3 }}>
-              <h3>Trạng thái</h3>
+              <Typography variant="h6" fontWeight={600} mb={2}>Trạng thái</Typography>
               <FormControl fullWidth>
                 <Select defaultValue="đã xuất bản" {...register("status")}>
                   <MenuItem value="đã xuất bản">Đã xuất bản</MenuItem>
@@ -222,7 +233,7 @@ const ProductAdd = () => {
             </Box>
 
             <Box sx={{ mb: 3 }}>
-              <h3>Danh mục & Thẻ</h3>
+              <Typography variant="h6" fontWeight={600} mb={2}>Danh mục & Thẻ</Typography>
               <FormControl fullWidth>
                 <InputLabel>Danh mục</InputLabel>
                 <Select
@@ -260,7 +271,7 @@ const ProductAdd = () => {
             </Box>
 
             <Box sx={{ mb: 3 }}>
-              <h3>Sản phẩm nổi bật</h3>
+              <Typography variant="h6" fontWeight={600} mb={2}>Sản phẩm nổi bật</Typography>
               <FormControlLabel
                 control={<Switch checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} color="primary" />}
                 label={<Typography>{isFeatured ? "Có" : "Không"}</Typography>}

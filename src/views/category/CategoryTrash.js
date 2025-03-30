@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -16,14 +16,14 @@ import {
   MenuItem,
   Checkbox,
   Button,
-  TablePagination
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import RestoreIcon from '@mui/icons-material/RestoreFromTrash';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useNavigate } from 'react-router-dom';
-
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 const CategoryTrash = () => {
   const navigate = useNavigate();
 
@@ -44,13 +44,13 @@ const CategoryTrash = () => {
       deletedAt: '2024-03-24',
       selected: false,
     },
-    // Thêm dữ liệu mẫu nhiều hơn nếu muốn test phân trang
+   
   ]);
 
   const [searchText, setSearchText] = useState('');
   const [sortOption, setSortOption] = useState('');
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page] = useState(0);
+  const [rowsPerPage] = useState(5);
 
   const handleRestore = (item) => {
     ConfirmDialog({
@@ -128,37 +128,54 @@ const CategoryTrash = () => {
           Danh sách danh mục đã xóa
         </Typography>
 
-        <Box display="flex" gap={3} mb={4} mt={3}>
-          <TextField
-            label="Tìm kiếm danh mục"
-            placeholder="Nhập tên danh mục..."
-            fullWidth
-            variant="outlined"
-            size="medium"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Select
-            fullWidth
-            size="medium"
-            displayEmpty
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
+
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <Box
+            display="grid"
+            gridTemplateColumns="2fr 1fr 1fr"
+            gap={2}
+            mb={4}
+            mt={3}
           >
-            <MenuItem value="">Sắp xếp theo</MenuItem>
-            <MenuItem value="nameAsc">Tên A → Z</MenuItem>
-            <MenuItem value="nameDesc">Tên Z → A</MenuItem>
-            <MenuItem value="dateAsc">Ngày xóa cũ → mới</MenuItem>
-            <MenuItem value="dateDesc">Ngày xóa mới → cũ</MenuItem>
-          </Select>
-        </Box>
+            <TextField
+              label="Tìm kiếm danh mục"
+              placeholder="Nhập tên danh mục..."
+              variant="outlined"
+              fullWidth
+              size="medium"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              displayEmpty
+              size="medium"
+              fullWidth
+            >
+              <MenuItem value="">Sắp xếp theo</MenuItem>
+              <MenuItem value="nameAsc">Tên A → Z</MenuItem>
+              <MenuItem value="nameDesc">Tên Z → A</MenuItem>
+              <MenuItem value="dateAsc">Ngày xóa cũ → mới</MenuItem>
+              <MenuItem value="dateDesc">Ngày xóa mới → cũ</MenuItem>
+            </Select>
+
+            <DatePicker
+              label="Lọc theo ngày xóa"
+              value={null} // cần thêm state nếu muốn lọc thật
+              onChange={() => { }} // xử lý khi chọn
+              slotProps={{ textField: { fullWidth: true, size: 'medium' } }}
+            />
+          </Box>
+        </LocalizationProvider>
 
         <Box overflow="auto">
           <Table>
@@ -225,23 +242,47 @@ const CategoryTrash = () => {
           </Table>
         </Box>
 
-        <TablePagination
-          component="div"
-          count={filteredData.length}
-          page={page}
-          onPageChange={(e, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-        />
+        <Box display="flex" justifyContent="center" gap={2} mt={4}>
+          <IconButton disabled>
+            <Typography fontSize="18px" color="text.secondary">❮</Typography>
+          </IconButton>
+
+          {[1, 2, 3, 4, 5].map((page) => (
+            <Box
+              key={page}
+              width={36}
+              height={36}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderRadius="50%"
+              bgcolor={page === 1 ? "primary.main" : "transparent"}
+              color={page === 1 ? "#fff" : "text.primary"}
+              sx={{
+                cursor: "pointer",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor: page === 1 ? "primary.main" : "grey.100",
+                },
+              }}
+            >
+              <Typography fontSize="14px" fontWeight="bold">
+                {page}
+              </Typography>
+            </Box>
+          ))}
+
+          <IconButton>
+            <Typography fontSize="18px" color="text.secondary">❯</Typography>
+          </IconButton>
+        </Box>
+
 
         <Box mt={4} display="flex" justifyContent="space-between">
           <Button
             variant="outlined"
             color="inherit"
-            onClick={() => navigate('/category')}
+            onClick={() => navigate('/admin/category')}
           >
             ← Quay về danh sách
           </Button>

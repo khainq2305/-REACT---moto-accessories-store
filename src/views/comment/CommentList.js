@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -14,7 +14,7 @@ import {
   Button,
   TextField,
   InputAdornment,
-  TablePagination,
+  
   Select,
   MenuItem,
   Paper,
@@ -59,14 +59,10 @@ const CommentList = () => {
   const navigate = useNavigate();
   const [sortOption, setSortOption] = useState("default");
   const [searchText, setSearchText] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page] = useState(0);
+  const [rowsPerPage] = useState(5);
 
-  const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+ 
 
   const getFilteredData = () => {
     let filtered = [...mockComments];
@@ -133,7 +129,7 @@ const CommentList = () => {
             displayEmpty
             sx={{ minWidth: 500, backgroundColor: "white" }}
           >
-            <MenuItem value="default">🗂️ Mặc định</MenuItem>
+            <MenuItem value="default">Mặc định</MenuItem>
             <MenuItem value="most-commented">💬 Bình luận nhiều nhất</MenuItem>
             <MenuItem value="highest-rating">⭐ Sao cao nhất</MenuItem>
             <MenuItem value="lowest-rating">⭐ Sao thấp nhất</MenuItem>
@@ -142,7 +138,7 @@ const CommentList = () => {
           </Select>
 
           <TextField
-            placeholder="🔍 Tìm kiếm sản phẩm..."
+            placeholder="Tìm kiếm sản phẩm..."
             variant="outlined"
             size="small"
             sx={{ minWidth: 500, backgroundColor: "white" }}
@@ -218,7 +214,7 @@ const CommentList = () => {
                     <Button
                       variant="outlined"
                       startIcon={<VisibilityIcon />}
-                      onClick={() => navigate(`/comment/${item.productId}`)}
+                      onClick={() => navigate(`/admin/comment/${item.productId}`)}
                     >
                       Xem chi tiết
                     </Button>
@@ -235,15 +231,42 @@ const CommentList = () => {
           </TableBody>
         </Table>
 
-        <TablePagination
-          component="div"
-          count={getFilteredData().length}
-          page={page}
-          onPageChange={handleChangePage}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          rowsPerPageOptions={[5, 10, 25]}
-        />
+        <Box display="flex" justifyContent="center" gap={2} mt={4}>
+          <IconButton disabled>
+            <Typography fontSize="18px" color="text.secondary">❮</Typography>
+          </IconButton>
+
+          {[1, 2, 3, 4, 5].map((page) => (
+            <Box
+              key={page}
+              width={36}
+              height={36}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderRadius="50%"
+              bgcolor={page === 1 ? "primary.main" : "transparent"}
+              color={page === 1 ? "#fff" : "text.primary"}
+              sx={{
+                cursor: "pointer",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor: page === 1 ? "primary.main" : "grey.100",
+                },
+              }}
+            >
+              <Typography fontSize="14px" fontWeight="bold">
+                {page}
+              </Typography>
+            </Box>
+          ))}
+
+          <IconButton>
+            <Typography fontSize="18px" color="text.secondary">❯</Typography>
+          </IconButton>
+        </Box>
+       
+
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import useToast from "../../components/Toast";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -20,11 +20,14 @@ import {
   TableRow,
   Checkbox,
   IconButton,
-  TablePagination,
   Menu,
   Button,
   useTheme,
 } from "@mui/material";
+
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+
 import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
@@ -35,8 +38,7 @@ const initialData = [
   {
     id: 1,
     uname: "Ốp pô xe",
-    imageUrl:
-      "https://shop2banh.vn/images/thumbs/2024/05/tay-thang-cnc-cho-honda-wave-2303-slide-products-6646dbdfd57c6.JPG",
+    imageUrl: "https://shop2banh.vn/images/thumbs/2024/05/tay-thang-cnc-cho-honda-wave-2303-slide-products-6646dbdfd57c6.JPG",
     status: 1,
     selected: false,
     createdAt: "2024-03-01",
@@ -44,8 +46,7 @@ const initialData = [
   {
     id: 2,
     uname: "Đèn led",
-    imageUrl:
-      "https://shop2banh.vn/images/thumbs/2024/09/tay-thang-gh-racing-cnc-cho-honda-lead-2361-slide-products-66f4d30b965ff.jpg",
+    imageUrl: "https://shop2banh.vn/images/thumbs/2024/09/tay-thang-gh-racing-cnc-cho-honda-lead-2361-slide-products-66f4d30b965ff.jpg",
     status: 0,
     selected: false,
     createdAt: "2024-03-05",
@@ -53,8 +54,7 @@ const initialData = [
   {
     id: 3,
     uname: "Kính chắn gió",
-    imageUrl:
-      "https://shop2banh.vn/images/thumbs/2022/07/dia-kingspeed-260mm-mau-moi-4-lo-products-1860.jpg",
+    imageUrl: "https://shop2banh.vn/images/thumbs/2022/07/dia-kingspeed-260mm-mau-moi-4-lo-products-1860.jpg",
     status: 1,
     selected: false,
     createdAt: "2024-03-10",
@@ -68,12 +68,13 @@ const CategoryPage = () => {
 
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [fromDate, setFromDate] = useState(null);
   const [data, setData] = useState(initialData);
-  const [trash, setTrash] = useState([]);
+  const [setTrash] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page] = useState(0);
+  const [rowsPerPage]= useState(5);
 
   const handleSearchChange = (e) => {
     setSearchText(e.target.value.toLowerCase());
@@ -94,14 +95,14 @@ const CategoryPage = () => {
   };
 
   const handleEdit = () => {
-    if (menuRow) navigate(`/category/edit/${menuRow.id}`);
+    if (menuRow) navigate(`/admin/category/edit/${menuRow.id}`);
     handleCloseMenu();
   };
 
   const handleDelete = () => {
     ConfirmDialog({
       title: "Xác nhận xóa",
-      text: `Bạn có chắc chắn muốn xóa \"${menuRow?.uname}\"?`,
+      text: `Bạn có chắc chắn muốn xóa "${menuRow?.uname}"?`,
       onConfirm: () => {
         setData((prev) => prev.filter((item) => item.id !== menuRow.id));
         setTrash((prev) => [...prev, { ...menuRow, selected: false }]);
@@ -126,9 +127,9 @@ const CategoryPage = () => {
 
   const filteredData = data.filter((item) => {
     const matchText = item.uname.toLowerCase().includes(searchText);
-    const matchStatus =
-      filterStatus === "all" || item.status.toString() === filterStatus;
-    return matchText && matchStatus;
+    const matchStatus = filterStatus === "all" || item.status.toString() === filterStatus;
+    const matchDate = !fromDate || new Date(item.createdAt) >= new Date(fromDate);
+    return matchText && matchStatus && matchDate;
   });
 
   return (
@@ -141,7 +142,7 @@ const CategoryPage = () => {
           <Button
             variant="outlined"
             color="error"
-            onClick={() => navigate("/category/trash")}
+            onClick={() => navigate("/admin/category/trash")}
             startIcon={<DeleteIcon />}
             sx={{ fontSize: "14px", py: 1.2, px: 2 }}
           >
@@ -149,41 +150,49 @@ const CategoryPage = () => {
           </Button>
         </Box>
 
-        <Box
-  display="flex"
-  alignItems="center"
-  justifyContent="space-between"
-  gap={2}
-  flexWrap="wrap"
-  mb={3}
->
-  <TextField
-    placeholder="🔍 Tìm kiếm danh mục..."
-    variant="outlined"
-    size="small"
-    onChange={handleSearchChange}
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchIcon />
-        </InputAdornment>
-      ),
-    }}
-    sx={{ minWidth: 250, flex: 1 }}
-  />
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <Box
+            display="grid"
+            gridTemplateColumns="2fr 1fr 1fr"
+            gap={2}
+            mb={3}
+          >
+            <TextField
+              placeholder="Tìm kiếm danh mục..."
+              variant="outlined"
+              size="small"
+              onChange={handleSearchChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              fullWidth
+            />
 
-  <Select
-    value={filterStatus}
-    onChange={handleFilterChange}
-    size="small"
-    sx={{ minWidth: 180 }}
-  >
-    <MenuItem value="all">Tất cả trạng thái</MenuItem>
-    <MenuItem value="1">Đang hoạt động</MenuItem>
-    <MenuItem value="0">Dừng hoạt động</MenuItem>
-  </Select>
-</Box>
+            <Select
+              value={filterStatus}
+              onChange={handleFilterChange}
+              size="small"
+              fullWidth
+            >
+              <MenuItem value="all">Tất cả trạng thái</MenuItem>
+              <MenuItem value="1">Đang hoạt động</MenuItem>
+              <MenuItem value="0">Dừng hoạt động</MenuItem>
+            </Select>
 
+            <DatePicker
+              label="Lọc từ ngày tạo"
+              value={fromDate}
+              onChange={(date) => setFromDate(date)}
+              slotProps={{
+                textField: { size: "small", fullWidth: true },
+              }}
+            />
+          </Box>
+        </LocalizationProvider>
 
         <Table>
           <TableHead>
@@ -192,8 +201,7 @@ const CategoryPage = () => {
                 <Checkbox
                   onChange={handleSelectAll}
                   checked={
-                    filteredData.length > 0 &&
-                    filteredData.every((item) => item.selected)
+                    filteredData.length > 0 && filteredData.every((item) => item.selected)
                   }
                   indeterminate={
                     filteredData.some((item) => item.selected) &&
@@ -205,6 +213,7 @@ const CategoryPage = () => {
               <TableCell>Hình ảnh</TableCell>
               <TableCell>Tên danh mục</TableCell>
               <TableCell>Trạng thái</TableCell>
+              <TableCell align="center">Tổng sản phẩm</TableCell>
               <TableCell align="right">Hành động</TableCell>
             </TableRow>
           </TableHead>
@@ -253,6 +262,9 @@ const CategoryPage = () => {
                       )}
                     </Box>
                   </TableCell>
+                  <TableCell align="center">
+                    {Math.floor(Math.random() * 20)} sản phẩm
+                  </TableCell>
                   <TableCell align="right">
                     <IconButton onClick={(e) => handleOpenMenu(e, row)}>
                       <MoreVertIcon />
@@ -263,17 +275,41 @@ const CategoryPage = () => {
           </TableBody>
         </Table>
 
-        <TablePagination
-          component="div"
-          count={filteredData.length}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-        />
+        <Box display="flex" justifyContent="center" gap={2} mt={4}>
+          <IconButton disabled>
+            <Typography fontSize="18px" color="text.secondary">❮</Typography>
+          </IconButton>
+
+          {[1, 2, 3, 4, 5].map((page) => (
+            <Box
+              key={page}
+              width={36}
+              height={36}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              borderRadius="50%"
+              bgcolor={page === 1 ? "primary.main" : "transparent"}
+              color={page === 1 ? "#fff" : "text.primary"}
+              sx={{
+                cursor: "pointer",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor: page === 1 ? "primary.main" : "grey.100",
+                },
+              }}
+            >
+              <Typography fontSize="14px" fontWeight="bold">
+                {page}
+              </Typography>
+            </Box>
+          ))}
+
+          <IconButton>
+            <Typography fontSize="18px" color="text.secondary">❯</Typography>
+          </IconButton>
+        </Box>
+
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
           <MenuItem onClick={handleEdit}>

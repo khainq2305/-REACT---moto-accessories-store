@@ -2,7 +2,7 @@ import { useMediaQuery, Box, Drawer } from '@mui/material';
 import PropTypes from 'prop-types'; // Import PropTypes
 import SidebarItems from './SidebarItems';
 import Scrollbar from "../../../components/custom-scroll/Scrollbar";
-import Upgrade from './Upgrade';
+
 
 const Sidebar = (props) => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
@@ -43,7 +43,7 @@ const Sidebar = (props) => {
       <Scrollbar sx={{ height: "calc(100% - 73px)" }}>
         <SidebarItems />
       </Scrollbar>
-      <Upgrade />
+    
     </Drawer>
   );
 };

@@ -1,5 +1,18 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Grid,
+} from "@mui/material";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const orderDetails = {
@@ -35,25 +48,31 @@ const OrderDetail = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Box display="flex" alignItems="center" mb={2}>
+      <Box display="flex" alignItems="center" mb={3}>
         <IconButton onClick={() => navigate("/orders")}>
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h5">Chi tiết đơn hàng #{id}</Typography>
       </Box>
-      
-      <Box mb={3}>
-        <TextField fullWidth label="Mã đơn hàng" value={orderDetails.id} disabled margin="normal"/>
-        <TextField fullWidth label="Ngày đặt hàng" value={orderDetails.date} disabled margin="normal"/>
-        <TextField fullWidth label="Khách hàng" value={orderDetails.customer} disabled margin="normal"/>
-        <TextField fullWidth label="Trạng thái" value={orderDetails.status} disabled margin="normal"/>
-        <TextField fullWidth label="Số điện thoại" value={orderDetails.phone} disabled margin="normal"/>
-        <TextField fullWidth label="Email" value={orderDetails.email} disabled margin="normal"/>
-        <TextField fullWidth label="Tổng tiền" value={orderDetails.total.toLocaleString()} disabled margin="normal"/>
-        {orderDetails.status === "Đã hủy" && (
-          <TextField fullWidth label="Lý do hủy đơn" value={orderDetails.reasonCancel} disabled margin="normal"/>
-        )}
-      </Box>
+
+      {/* Chia 2 cột */}
+      <Grid container spacing={2} mb={4}>
+        <Grid item xs={12} md={6}>
+          <TextField fullWidth label="Mã đơn hàng" value={orderDetails.id} disabled margin="normal" />
+          <TextField fullWidth label="Ngày đặt hàng" value={orderDetails.date} disabled margin="normal" />
+          <TextField fullWidth label="Khách hàng" value={orderDetails.customer} disabled margin="normal" />
+          <TextField fullWidth label="Trạng thái" value={orderDetails.status} disabled margin="normal" />
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <TextField fullWidth label="Số điện thoại" value={orderDetails.phone} disabled margin="normal" />
+          <TextField fullWidth label="Email" value={orderDetails.email} disabled margin="normal" />
+          <TextField fullWidth label="Tổng tiền" value={orderDetails.total.toLocaleString()} disabled margin="normal" />
+          {orderDetails.status === "Đã hủy" && (
+            <TextField fullWidth label="Lý do hủy đơn" value={orderDetails.reasonCancel} disabled margin="normal" />
+          )}
+        </Grid>
+      </Grid>
 
       <Typography variant="h6" mb={2}>Danh sách sản phẩm</Typography>
       <TableContainer component={Paper}>
@@ -76,7 +95,7 @@ const OrderDetail = () => {
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.quantity}</TableCell>
                 <TableCell><del>{product.originalPrice.toLocaleString()}</del></TableCell>
-                <TableCell style={{color: "red"}}>{product.salePrice.toLocaleString()} VNĐ</TableCell>
+                <TableCell style={{ color: "red" }}>{product.salePrice.toLocaleString()} VNĐ</TableCell>
               </TableRow>
             ))}
           </TableBody>

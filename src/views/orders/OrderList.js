@@ -227,7 +227,7 @@ const OrderList = () => {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
   <MenuItem
     onClick={() => {
-      navigate(`/orders/${selectedOrderId}`);
+      navigate(`/admin/orders/${selectedOrderId}`);
       handleMenuClose();
     }}
   >

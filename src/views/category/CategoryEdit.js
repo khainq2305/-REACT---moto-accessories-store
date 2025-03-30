@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import {  useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card, CardHeader, CardContent, TextField, Typography, Button,
@@ -6,11 +6,13 @@ import {
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloseIcon from '@mui/icons-material/Close';
-import styles from './CategoryAdd.module.scss'; // Dùng lại SCSS từ Add
+import styles from './CategoryAdd.module.scss';
+import TinyEditor from '../../components/EDITOR/TinyEditor';
 
 const CategoryEdit = () => {
-  const { id } = useParams(); // 👈 Lấy id từ URL
+  const { id } = useParams();
   const navigate = useNavigate();
+  const [description, setDescription] = useState('');
 
   const [categoryName, setCategoryName] = useState('');
   const [status, setStatus] = useState('');
@@ -18,22 +20,7 @@ const CategoryEdit = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const fileInputRef = useRef();
 
-  useEffect(() => {
-    // Giả lập dữ liệu từ id
-    if (id) {
-      const fakeData = {
-        categoryName: 'Mũ bảo hiểm',
-        status: '1',
-        selectedImage: '/assets/images/helmet.jpg',
-        selectedFileName: 'helmet.jpg'
-      };
-      setCategoryName(fakeData.categoryName);
-      setStatus(fakeData.status);
-      setSelectedImage(fakeData.selectedImage);
-      setSelectedFileName(fakeData.selectedFileName);
-    }
-  }, [id]);
-
+ 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -68,7 +55,7 @@ const CategoryEdit = () => {
 
   return (
     <Card elevation={3}>
-      <CardHeader title="Chỉnh sửa Danh Mục" sx={{ fontWeight: 'bold', pb: 0 }} />
+      <CardHeader title="Chỉnh sửa danh mục" sx={{ fontWeight: 'bold', pb: 0 }} />
       <CardContent>
         <form onSubmit={handleSubmit}>
           <Box mb={3}>
@@ -146,12 +133,8 @@ const CategoryEdit = () => {
 
           <Box mb={3}>
             <Typography fontWeight={600} mb={1}>Mô tả danh mục</Typography>
-            <TextField
-              placeholder="Mô tả danh mục..."
-              multiline
-              rows={4}
-              fullWidth
-            />
+            <TinyEditor value={description} onChange={setDescription} />
+
           </Box>
 
           <Box mt={3} display="flex" gap={2}>

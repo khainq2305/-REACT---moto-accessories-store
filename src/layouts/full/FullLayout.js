@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { styled, Container, Box } from '@mui/material';
 
-
+import { useEffect } from "react";
 
 import Header from './header/Header';
 import Sidebar from './sidebar/Sidebar';
@@ -27,7 +27,14 @@ const FullLayout = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   // const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  useEffect(() => {
+    const prevFontSize = document.documentElement.style.fontSize;
+    document.documentElement.style.fontSize = '100%'; // Admin rem = 16px
 
+    return () => {
+      document.documentElement.style.fontSize = prevFontSize; // Trả lại font-size cho client
+    };
+  }, []);
   return (
     <>
       {/* ------------------------------------------- */}

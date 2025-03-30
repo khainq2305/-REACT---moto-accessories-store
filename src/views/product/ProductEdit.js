@@ -17,7 +17,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { useState } from "react";
 import useToast from "../../components/Toast";
-
+import TinyEditor from "../../components/EDITOR/TinyEditor";
 const ProductEdit = () => {
   const toast = useToast();
   const { register, handleSubmit, control } = useForm();
@@ -60,7 +60,7 @@ const ProductEdit = () => {
     setProductImages((prev) => prev.filter((_, index) => index !== indexToRemove));
   };
 
-  
+
 
   const handleAddCategory = () => {
     const trimmed = newCategory.trim();
@@ -81,7 +81,20 @@ const ProductEdit = () => {
               <h3>Thông tin chung</h3>
               <TextField fullWidth label="Tên sản phẩm" placeholder="Nhập tên sản phẩm" {...register("productName")} sx={{ mt: 2 }} />
             </Box>
-
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" fontWeight={500} mb={1}>Mô tả sản phẩm</Typography>
+              <Controller
+                name="description"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TinyEditor
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              />
+            </Box>
             <Box sx={{ mb: 3 }}>
               <h3>Giá cả</h3>
               <TextField fullWidth label="Giá gốc" type="number" placeholder="Nhập giá sản phẩm" {...register("originalPrice")} />

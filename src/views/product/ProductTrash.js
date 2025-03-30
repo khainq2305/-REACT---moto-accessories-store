@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   Box, Button, Checkbox, FormControl, Grid, IconButton, InputAdornment,
   MenuItem, Paper, Select, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, TextField, Typography, Avatar, Chip
+  TableHead, TableRow, TextField, Typography, Chip
 } from "@mui/material";
 import { Pagination } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -23,8 +23,8 @@ const ProductTrash = () => {
   const [fromDate, setFromDate] = useState(null);
 
   const trashedProducts = [
-    { id: 3, name: "Gương xe máy", category: "Phụ kiện", deletedAt: "2025-03-15", image: "/images/guong-xe-may.jpg" },
-    { id: 4, name: "Vỏ xe máy", category: "Vỏ xe", deletedAt: "2025-03-20", image: "/images/vo-xe-may.jpg" },
+    { id: 3, name: "Gương xe máy", category: "Phụ kiện", deletedAt: "2025-03-15", image: "https://shop2banh.vn/images/thumbs/2024/10/tay-thang-gh-racing-cnc-cho-honda-sh-products-2337.jpg" },
+    { id: 4, name: "Vỏ xe máy", category: "Vỏ xe", deletedAt: "2025-03-20", image: "https://shop2banh.vn/images/thumbs/2022/04/che-ket-nuoc-cnc-anode-cho-honda-shvn-2020-products-1727.jpg" },
   ];
 
   const handleSelect = (id) => {
@@ -51,62 +51,62 @@ const ProductTrash = () => {
         </IconButton>
 
 
-<Typography variant="h5" fontWeight={600} display="flex" alignItems="center" gap={1}>
-  <DeleteOutlineIcon />
-  Thùng rác sản phẩm
-</Typography>
+        <Typography variant="h5" fontWeight={600} display="flex" alignItems="center" gap={1}>
+          <DeleteOutlineIcon />
+          Thùng rác sản phẩm
+        </Typography>
 
       </Box>
 
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-  <Grid container spacing={2} mb={2}>
-  <Grid item xs={12} md={4.5}>
-  <TextField
-    fullWidth
-    placeholder="Tìm kiếm sản phẩm..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-    InputProps={{
-      startAdornment: (
-        <InputAdornment position="start">
-          <SearchIcon />
-        </InputAdornment>
-      ),
-    }}
-  />
-</Grid>
+        <Grid container spacing={2} mb={2}>
+          <Grid item xs={12} md={4.5}>
+            <TextField
+              fullWidth
+              placeholder="Tìm kiếm sản phẩm..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
 
-<Grid item xs={12} md={2.5}>
-  <FormControl fullWidth>
-    <Select value={filter} displayEmpty onChange={(e) => setFilter(e.target.value)}>
-      <MenuItem value="">Tất cả danh mục</MenuItem>
-      <MenuItem value="Phụ kiện">Phụ kiện</MenuItem>
-      <MenuItem value="Vỏ xe">Vỏ xe</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>
+          <Grid item xs={12} md={2.5}>
+            <FormControl fullWidth>
+              <Select value={filter} displayEmpty onChange={(e) => setFilter(e.target.value)}>
+                <MenuItem value="">Tất cả danh mục</MenuItem>
+                <MenuItem value="Phụ kiện">Phụ kiện</MenuItem>
+                <MenuItem value="Vỏ xe">Vỏ xe</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-<Grid item xs={12} md={2.5}>
-  <FormControl fullWidth>
-    <Select value={sort} displayEmpty onChange={(e) => setSort(e.target.value)}>
-      <MenuItem value="">Sắp xếp ngày xóa</MenuItem>
-      <MenuItem value="asc">Cũ nhất</MenuItem>
-      <MenuItem value="desc">Mới nhất</MenuItem>
-    </Select>
-  </FormControl>
-</Grid>
+          <Grid item xs={12} md={2.5}>
+            <FormControl fullWidth>
+              <Select value={sort} displayEmpty onChange={(e) => setSort(e.target.value)}>
+                <MenuItem value="">Sắp xếp ngày xóa</MenuItem>
+                <MenuItem value="asc">Cũ nhất</MenuItem>
+                <MenuItem value="desc">Mới nhất</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
 
-<Grid item xs={12} md={2.5}>
-  <DatePicker
-    label="Từ ngày"
-    value={fromDate}
-    onChange={(newValue) => setFromDate(newValue)}
-    renderInput={(params) => <TextField {...params} fullWidth />}
-  />
-</Grid>
+          <Grid item xs={12} md={2.5}>
+            <DatePicker
+              label="Từ ngày"
+              value={fromDate}
+              onChange={(newValue) => setFromDate(newValue)}
+              renderInput={(params) => <TextField {...params} fullWidth />}
+            />
+          </Grid>
 
-  </Grid>
-</LocalizationProvider>
+        </Grid>
+      </LocalizationProvider>
 
 
       <TableContainer component={Paper}>
@@ -135,8 +135,19 @@ const ProductTrash = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  <Avatar src={product.image} alt={product.name} />
-                </TableCell>
+  <img
+    src={product.image}
+    alt={product.name}
+    style={{
+      width: 60,
+      height: 60,
+      objectFit: 'cover',
+      borderRadius: 8, // 👈 nếu muốn bo góc nhẹ
+      border: '1px solid #eee'
+    }}
+  />
+</TableCell>
+
                 <TableCell>{product.name}</TableCell>
                 <TableCell><Chip label={product.category} /></TableCell>
                 <TableCell>{product.deletedAt}</TableCell>

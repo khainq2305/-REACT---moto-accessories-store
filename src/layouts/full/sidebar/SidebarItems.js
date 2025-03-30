@@ -10,12 +10,18 @@ import {
 import { IconPoint } from '@tabler/icons-react';
 import Menuitems from "./MenuItems";
 import logoicn from "../../../assets/images/logos/logo-dark.svg";
-import Upgrade from "./Upgrade";
 
-const renderMenuItems = (items, pathDirect) => {
+
+const renderMenuItems = (items, pathDirect, isChild = false) => {
   return items.map((item) => {
     const Icon = item.icon ? item.icon : IconPoint;
-    const itemIcon = <Icon stroke={1.5} size="1.3rem" />;
+    const itemIcon = (
+      <Icon
+        stroke={1.5}
+        size={isChild ? "1rem" : "1.3rem"} // 👈 Nhỏ hơn nếu là con
+        style={{ marginLeft: isChild ? "4px" : 0 }} // 👈 Dịch vào chút
+      />
+    );
 
     if (item.subheader) {
       return (
@@ -32,7 +38,7 @@ const renderMenuItems = (items, pathDirect) => {
           title={item.title}
           icon={itemIcon}
         >
-          {renderMenuItems(item.children, pathDirect)}
+          {renderMenuItems(item.children, pathDirect, true)} {/* 👈 đánh dấu là mục con */}
         </Submenu>
       );
     }
@@ -51,12 +57,16 @@ const renderMenuItems = (items, pathDirect) => {
         badgeTextColor="#1a97f5"
         disabled={item.disabled}
         borderRadius="9px"
+        sx={{
+          pl: isChild ? 4 : 2, // 👈 Thụt lề nếu là con
+        }}
       >
         {item.title}
       </MenuItem>
     );
   });
 };
+
 
 const SidebarItems = () => {
   const location = useLocation();
@@ -85,7 +95,7 @@ const SidebarItems = () => {
           </Box>
           {renderMenuItems(Menuitems, pathDirect)}
         </MUI_Sidebar>
-        <Upgrade />
+       
       </Box>
     </>
   );
