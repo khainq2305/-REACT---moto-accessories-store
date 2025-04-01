@@ -100,7 +100,7 @@ function Contact() {
     setOpenAction(false);
   };
 
-  
+
   const filteredData = data
     .filter((item) =>
       (item.name.toLowerCase().includes(searchKeyWord.toLowerCase()) ||
@@ -195,20 +195,20 @@ function Contact() {
                   <IconButton onClick={() => handleView(item)}><VisibilityIcon /></IconButton>
                   <IconButton><EmailIcon /></IconButton>
                   <IconButton
-  onClick={() => handleChangeStatus(item)}
-  disabled={item.status === "1"} // ✅ Không cho click nếu đã phản hồi
->
-<CheckCircleIcon
-  sx={{
-    color: item.status === "0" ? "#00C49F" : "#aaa",
-    border: "2px solid",
-    borderColor: item.status === "0" ? "#00C49F" : "#ccc",
-    borderRadius: "50%",
-    fontSize: 22
-  }}
-/>
+                    onClick={() => handleChangeStatus(item)}
+                    disabled={item.status === "1"} // ✅ Không cho click nếu đã phản hồi
+                  >
+                    <CheckCircleIcon
+                      sx={{
+                        color: item.status === "0" ? "#00C49F" : "#aaa",
+                        border: "2px solid",
+                        borderColor: item.status === "0" ? "#00C49F" : "#ccc",
+                        borderRadius: "50%",
+                        fontSize: 22
+                      }}
+                    />
 
-</IconButton>
+                  </IconButton>
 
                 </TableCell>
               </TableRow>
@@ -217,39 +217,39 @@ function Contact() {
         </TableBody>
       </Table>
       <Box display="flex" justifyContent="center" gap={2} mt={4}>
-  <IconButton disabled>
-    <Typography fontSize="18px" color="text.secondary">❮</Typography>
-  </IconButton>
+        <IconButton disabled>
+          <Typography fontSize="18px" color="text.secondary">❮</Typography>
+        </IconButton>
 
-  {[1, 2, 3, 4, 5].map((page) => (
-    <Box
-      key={page}
-      width={36}
-      height={36}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      borderRadius="50%"
-      bgcolor={page === 1 ? "primary.main" : "transparent"}
-      color={page === 1 ? "#fff" : "text.primary"}
-      sx={{
-        cursor: "pointer",
-        transition: "all 0.2s",
-        "&:hover": {
-          bgcolor: page === 1 ? "primary.main" : "grey.100",
-        },
-      }}
-    >
-      <Typography fontSize="14px" fontWeight="bold">
-        {page}
-      </Typography>
-    </Box>
-  ))}
+        {[1, 2, 3, 4, 5].map((page) => (
+          <Box
+            key={page}
+            width={36}
+            height={36}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius="50%"
+            bgcolor={page === 1 ? "primary.main" : "transparent"}
+            color={page === 1 ? "#fff" : "text.primary"}
+            sx={{
+              cursor: "pointer",
+              transition: "all 0.2s",
+              "&:hover": {
+                bgcolor: page === 1 ? "primary.main" : "grey.100",
+              },
+            }}
+          >
+            <Typography fontSize="14px" fontWeight="bold">
+              {page}
+            </Typography>
+          </Box>
+        ))}
 
-  <IconButton>
-    <Typography fontSize="18px" color="text.secondary">❯</Typography>
-  </IconButton>
-</Box>
+        <IconButton>
+          <Typography fontSize="18px" color="text.secondary">❯</Typography>
+        </IconButton>
+      </Box>
 
       {/* Modal xem nội dung */}
       <Modal open={openContent} onClose={() => setOpenContent(false)}>
