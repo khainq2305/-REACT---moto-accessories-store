@@ -14,7 +14,7 @@ import {
 
 import { IconListCheck, IconMail, IconUser } from '@tabler/icons-react';
 
-import ProfileImg from 'src/assets/images/profile/user-1.jpg';
+// import ProfileImg from 'src/assets/images/profile/user-1.jpg';
 
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
@@ -41,14 +41,7 @@ const Profile = () => {
         }}
         onClick={handleClick2}
       >
-        <Avatar
-          src={ProfileImg}
-          alt={ProfileImg}
-          sx={{
-            width: 35,
-            height: 35,
-          }}
-        />
+        
       </IconButton>
       {/* ------------------------------------------- */}
       {/* Message Dropdown */}

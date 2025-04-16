@@ -7,135 +7,213 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  RadioGroup,
   FormControlLabel,
-  Radio,
   Switch,
   Typography,
-  Slider,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
-import useToast from "../../components/Toast";
+import { useEffect, useState } from "react";
 import TinyEditor from "../../components/EDITOR/TinyEditor";
-const ProductAdd = () => {
-  const toast = useToast();
-  const { register, handleSubmit, control } = useForm();
+import { getCategories } from "../../services/productService";
 
-  const [discountType, setDiscountType] = useState("không giảm giá");
-  const [discountValue, setDiscountValue] = useState(0);
+const ProductAdd = () => {
+  const {
+    register,
+    handleSubmit,
+    control,
+    setError,
+    formState: { errors },
+  } = useForm();
+
   const [isFeatured, setIsFeatured] = useState(false);
-  const [productImages, setProductImages] = useState([]);
-  const [thumbnail, setThumbnail] = useState(null);
-  const [categories, setCategories] = useState(["danh mục1", "danh mục2"]);
+  const [image, setImage] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [newCategory, setNewCategory] = useState("");
-  const [showAddCategoryInput, setShowAddCategoryInput] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategories();
+        console.log("🔥 Kết quả API:", res);
+    
+        const result = res?.data?.data;
+    
+        if (Array.isArray(result)) {
+          setCategories(result);
+        } else if (Array.isArray(res?.data)) {
+          setCategories(res.data);
+        } else {
+          console.error("❌ Không phải mảng:", res);
+          setCategories([]);
+        }
+      } catch (err) {
+        console.error("❌ Lỗi lấy danh mục:", err);
+        setCategories([]); // fallback
+      }
+    };
+    
+  
+    fetchCategories();
+  }, []);
+  
 
   const onSubmit = (data) => {
-    toast("Lưu thành công!", "success");
-    console.log("Dữ liệu sản phẩm:", {
-      ...data,
-      thumbnail,
-      isFeatured,
-      discountType,
-      discountValue,
-      selectedCategory,
-      productImages,
-    });
-  };
+    let hasError = false;
 
-  const handleProductImagesChange = (e) => {
-    const files = Array.from(e.target.files);
-    const previews = files.map((file) => ({
-      name: file.name,
-      size: file.size,
-      url: URL.createObjectURL(file),
-      file,
-    }));
-    setProductImages((prev) => [...prev, ...previews]);
-  };
-
-  const removeImage = (indexToRemove) => {
-    setProductImages((prev) => prev.filter((_, index) => index !== indexToRemove));
-  };
-
-  const handleAddCategory = () => {
-    const trimmed = newCategory.trim();
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategories([...categories, trimmed]);
-      setSelectedCategory(trimmed);
-      setNewCategory("");
-      setShowAddCategoryInput(false);
+    if (!selectedCategory) {
+      setError("category", { message: "Vui lòng chọn danh mục" });
+      hasError = true;
     }
+
+    if (!image) {
+      setError("image", { message: "Vui lòng chọn hình ảnh" });
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    const finalData = {
+      ...data,
+      is_feature: isFeatured,
+      image,
+      category: selectedCategory,
+    };
+
+    console.log("✅ Dữ liệu gửi đi:", finalData);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Box sx={{ maxWidth: "1200px", margin: "auto", background: "#fff", padding: 4, borderRadius: 2, boxShadow: 3 }}>
+      <Box
+        sx={{
+          maxWidth: "1000px",
+          mx: "auto",
+          p: 4,
+          background: "#fff",
+          borderRadius: 2,
+          boxShadow: 3,
+        }}
+      >
+        <Typography variant="h5" fontWeight={600} mb={3}>
+          Thêm sản phẩm
+        </Typography>
+
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
+            <TextField
+              fullWidth
+              label="Tên sản phẩm"
+              {...register("productName", { required: "Tên sản phẩm là bắt buộc" })}
+              error={!!errors.productName}
+              helperText={errors.productName?.message}
+              sx={{ mb: 3 }}
+            />
+
+            <Typography variant="subtitle1" mb={1}>
+              Mô tả
+            </Typography>
+            <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Mô tả là bắt buộc" }}
+              render={({ field }) => (
+                <TinyEditor value={field.value} onChange={field.onChange} />
+              )}
+            />
+            {errors.description && (
+              <Typography color="error" fontSize={13} mt={0.5}>
+                {errors.description.message}
+              </Typography>
+            )}
+
+            <TextField
+              fullWidth
+              label="Giá gốc (VNĐ)"
+              type="number"
+              {...register("originalPrice", {
+                required: "Giá gốc là bắt buộc",
+                min: { value: 0, message: "Giá phải >= 0" },
+              })}
+              error={!!errors.originalPrice}
+              helperText={errors.originalPrice?.message}
+              sx={{ mt: 3 }}
+            />
+
+            <TextField
+              fullWidth
+              label="Giá giảm (VNĐ)"
+              type="number"
+              {...register("discountPrice", {
+                required: "Giá giảm là bắt buộc",
+                min: { value: 0, message: "Giá phải >= 0" },
+              })}
+              error={!!errors.discountPrice}
+              helperText={errors.discountPrice?.message}
+              sx={{ mt: 3 }}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={4}>
+            <FormControl fullWidth sx={{ mb: 1 }}>
+              <InputLabel>Danh mục</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                label="Danh mục"
+                error={!!errors.category}
+              >
+                <MenuItem value="">Chọn danh mục</MenuItem>
+                {categories.map((cat) => (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              {errors.category && (
+                <Typography color="error" fontSize={13} mt={0.5}>
+                  {errors.category.message}
+                </Typography>
+              )}
+            </FormControl>
+
+            <FormControl fullWidth sx={{ mb: 3 }}>
+              <InputLabel>Trạng thái</InputLabel>
+              <Select defaultValue="đã xuất bản" {...register("status")}>
+                <MenuItem value="đã xuất bản">Đã xuất bản</MenuItem>
+                <MenuItem value="bản nháp">Bản nháp</MenuItem>
+              </Select>
+            </FormControl>
+
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Thông tin chung</Typography>
-              <TextField fullWidth label="Tên sản phẩm" placeholder="Nhập tên sản phẩm" {...register("productName")} />
-            </Box>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" fontWeight={500} mb={1}>Mô tả sản phẩm</Typography>
-              <Controller
-                name="description"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TinyEditor
-                    value={field.value}
-                    onChange={(value) => field.onChange(value)}
+              <Typography variant="subtitle1" fontWeight={500} mb={1}>
+                Sản phẩm nổi bật
+              </Typography>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={isFeatured}
+                    onChange={(e) => setIsFeatured(e.target.checked)}
                   />
-                )}
+                }
+                label={isFeatured ? "Có" : "Không"}
               />
             </Box>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Giá cả</Typography>
-              <TextField fullWidth label="Giá gốc" type="number" placeholder="Nhập giá sản phẩm" {...register("originalPrice")} />
 
-              <Typography variant="subtitle1" fontWeight={500} mt={2}>Loại giảm giá</Typography>
-              <RadioGroup row value={discountType} onChange={(e) => { setDiscountType(e.target.value); setDiscountValue(0); }}>
-                <FormControlLabel value="không giảm giá" control={<Radio />} label="Không giảm giá" />
-                <FormControlLabel value="giảm theo %" control={<Radio />} label="Phần trăm %" />
-                <FormControlLabel value="giảm theo giá cố định" control={<Radio />} label="Giá cố định" />
-              </RadioGroup>
-
-              {discountType === "giảm theo giá cố định" && (
-                <TextField fullWidth type="number" label="Giá giảm (VNĐ)" placeholder="Nhập giá giảm" {...register("discountValue")} />
-              )}
-
-              {discountType === "giảm theo %" && (
-                <Box sx={{ mt: 2 }}>
-                  <InputLabel sx={{ mb: 1 }}>Đặt phần trăm giảm giá</InputLabel>
-                  <Slider
-                    value={Number(discountValue)}
-                    onChange={(e, newValue) => setDiscountValue(newValue)}
-                    min={0}
-                    max={100}
-                    step={1}
-                    valueLabelDisplay="on"
-                    sx={{ color: "primary.main" }}
-                  />
-                </Box>
-              )}
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Hình ảnh sản phẩm</Typography>
+            <Box sx={{ mb: 1 }}>
+              <Typography variant="subtitle1" fontWeight={500} mb={1}>
+                Hình ảnh
+              </Typography>
               <Box
                 component="label"
-                htmlFor="product-images"
+                htmlFor="product-image"
                 sx={{
                   border: "2px dashed #3f51b5",
                   backgroundColor: "#f5f8ff",
                   padding: 3,
                   textAlign: "center",
                   borderRadius: 2,
-                  mt: 2,
+                  mt: 1,
                   height: 150,
                   display: "flex",
                   alignItems: "center",
@@ -145,137 +223,31 @@ const ProductAdd = () => {
                   fontWeight: 500,
                 }}
               >
-                Kéo và thả một số tệp ở đây hoặc nhấp để chọn tệp
-                <input id="product-images" type="file" hidden multiple accept="image/*" onChange={handleProductImagesChange} />
-              </Box>
-
-              {productImages.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle1" fontWeight={500}>Tập tin:</Typography>
-                  {productImages.map((img, index) => (
-                    <Box key={index} sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "#fff", border: "1px solid #eee", borderRadius: 2, px: 2, py: 1, mb: 1 }}>
-                      <Box sx={{ flex: 1, overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>
-                        📄 {img.name}
-                      </Box>
-                      <Box sx={{ color: "#fff", backgroundColor: "#3f51b5", borderRadius: 20, px: 2, py: 0.5, fontSize: 12, ml: 2, mr: 1, minWidth: 80, textAlign: "center" }}>
-                        {(img.size / 1024).toFixed(0)} KB
-                      </Box>
-                      <Button variant="text" color="error" onClick={() => removeImage(index)} sx={{ fontSize: 18 }}>
-                        ❌
-                      </Button>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Ảnh đại diện</Typography>
-              <FormControl fullWidth>
-                <Controller
-                  name="thumbnail"
-                  control={control}
-                  defaultValue={null}
-                  render={({ field }) => (
-                    <Box
-                      component="label"
-                      htmlFor="thumbnail"
-                      sx={{
-                        border: "2px dashed #3f51b5",
-                        color: "#3f51b5",
-                        padding: 3,
-                        textAlign: "center",
-                        borderRadius: 2,
-                        mt: 2,
-                        height: 150,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Kéo & thả ảnh vào đây, hoặc bấm để chọn ảnh
-                      <input
-                        id="thumbnail"
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            setThumbnail(URL.createObjectURL(file));
-                            field.onChange(file);
-                          }
-                        }}
-                      />
-                    </Box>
-                  )}
+                Nhấn hoặc kéo để chọn ảnh
+                <input
+                  id="product-image"
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImage(file);
+                    }
+                  }}
                 />
-              </FormControl>
+              </Box>
+              {errors.image && (
+                <Typography color="error" fontSize={13} mt={0.5}>
+                  {errors.image.message}
+                </Typography>
+              )}
 
-              {thumbnail && (
-                <Box sx={{ mt: 2 }}>
-                  <img src={thumbnail} alt="thumbnail" style={{ width: "100%", height: 120, objectFit: "cover", borderRadius: 4, border: "1px solid #eee" }} />
+              {image && (
+                <Box mt={2}>
+                  <Typography fontSize={14}>📁 {image.name}</Typography>
                 </Box>
               )}
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Trạng thái</Typography>
-              <FormControl fullWidth>
-                <Select defaultValue="đã xuất bản" {...register("status")}>
-                  <MenuItem value="đã xuất bản">Đã xuất bản</MenuItem>
-                  <MenuItem value="bản nháp">Bản nháp</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Danh mục & Thẻ</Typography>
-              <FormControl fullWidth>
-                <InputLabel>Danh mục</InputLabel>
-                <Select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  label="Danh mục"
-                >
-                  <MenuItem value="">Chọn danh mục</MenuItem>
-                  {categories.map((cat, i) => (
-                    <MenuItem key={i} value={cat}>{cat}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {showAddCategoryInput ? (
-                <Box sx={{ display: "flex", mt: 1, gap: 1 }}>
-                  <TextField
-                    size="small"
-                    placeholder="Tên danh mục mới"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleAddCategory();
-                    }}
-                  />
-                  <Button variant="contained" onClick={handleAddCategory}>
-                    Thêm
-                  </Button>
-                </Box>
-              ) : (
-                <Button sx={{ mt: 1 }} variant="outlined" onClick={() => setShowAddCategoryInput(true)}>
-                  + Thêm danh mục mới
-                </Button>
-              )}
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight={600} mb={2}>Sản phẩm nổi bật</Typography>
-              <FormControlLabel
-                control={<Switch checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} color="primary" />}
-                label={<Typography>{isFeatured ? "Có" : "Không"}</Typography>}
-              />
             </Box>
           </Grid>
         </Grid>
@@ -285,6 +257,12 @@ const ProductAdd = () => {
             Lưu sản phẩm
           </Button>
         </Box>
+        {Object.keys(errors).length > 0 && (
+  <Typography color="error" mt={2}>
+    ❌ Vui lòng điền đầy đủ thông tin trước khi lưu sản phẩm.
+  </Typography>
+)}
+
       </Box>
     </form>
   );

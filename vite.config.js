@@ -9,8 +9,13 @@ import svgr from '@svgr/rollup';
 export default defineConfig({
     resolve: {
         alias: {
-            src: resolve(__dirname, 'src'),
-        },
+            '@': resolve(__dirname, 'src'),
+            '@components': resolve(__dirname, 'src/components'),
+            '@services': resolve(__dirname, 'src/services'),
+            '@views': resolve(__dirname, 'src/views'),
+            '@assets': resolve(__dirname, 'src/assets'),
+          },
+          
     },
     esbuild: {
         loader: 'jsx',
@@ -35,7 +40,15 @@ export default defineConfig({
             ],
         },
     },
-
+    server: {
+        proxy: {
+          '/api': {
+            target: 'http://localhost:3001', // ✅ đúng là backend đang chạy port 3000
+            changeOrigin: true,
+            rewrite: (path) => path.replace(/^\/api/, ''),
+          },
+        },
+      },
 
     
     // plugins: [react(),svgr({

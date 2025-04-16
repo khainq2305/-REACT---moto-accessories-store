@@ -1,155 +1,198 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import {
   Box,
-  Chip,
-  IconButton,
-  Paper,
+  Typography,
+  Stack,
+  Button,
+  Grid,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  Pagination,
-  TextField,
-  Stack,
-  Button,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
+  Paper,
+  IconButton,
+  Chip,
   Menu,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  RadioGroup,
-  Radio,
-  FormControlLabel,
-
-  Grid,
-  InputAdornment
 } from "@mui/material";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import CheckIcon from '@mui/icons-material/Check';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import HomeIcon from '@mui/icons-material/Home';
-import CloseIcon from '@mui/icons-material/Close';
-import ListIcon from '@mui/icons-material/List';
-import SearchIcon from '@mui/icons-material/Search';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import UpdateIcon from '@mui/icons-material/Update';
-import CancelIcon from '@mui/icons-material/Cancel';
-const orders = [
-  { id: 315, email: "khainqpc08388@gmail.com", date: "2025-03-03", total: 2471000, status: "Chờ xác nhận", payment: "Chưa thanh toán" },
-  { id: 314, email: "user2@gmail.com", date: "2025-03-02", total: 444000, status: "Đã xác nhận", payment: "Chưa thanh toán" },
-];
+import {
+  List as ListIcon,
+  CalendarMonth,
+  Check,
+  LocalShipping,
+  Home,
+  Close,
+  Search,
+  MoreVert,
+  Visibility,
+  Update,
+  Cancel,
+} from "@mui/icons-material";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { adminOrderService } from "../../services/orderService";
+
+import PaginationComponent from "../../components/Pagination";
+import UpdateStatusDialog from "../../components/Dialog/UpdateStatusOrderDialog";
+import CancelOrderDialog from "../../components/Dialog/CancelOrderDialog";
+import { toast } from "react-toastify";
 
 const statusFilters = [
-  { label: "Tất cả", icon: <ListIcon />, value: "" },
-  { label: "Chờ Xác Nhận", icon: <CalendarMonthIcon />, value: "Chờ xác nhận" },
-  { label: "Đã Xác Nhận", icon: <CheckIcon />, value: "Đã xác nhận" },
-  { label: "Đang Giao", icon: <LocalShippingIcon />, value: "Đang giao" },
-  { label: "Đã Giao", icon: <HomeIcon />, value: "Đã giao" },
-  { label: "Đã Hủy", icon: <CloseIcon />, value: "Đã hủy" },
+  { label: "Tất cả", icon: <ListIcon />, value: "", color: "primary" },
+  { label: "Chờ xác nhận", icon: <CalendarMonth />, value: 0, color: "warning" },
+  { label: "Đã xác nhận", icon: <Check />, value: 1, color: "info" },
+  { label: "Đang giao", icon: <LocalShipping />, value: 2, color: "secondary" },
+  { label: "Đã giao", icon: <Home />, value: 3, color: "success" },
+  { label: "Đã hủy", icon: <Close />, value: 4, color: "error" },
 ];
 
 const OrderList = () => {
   const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [status, setStatus] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [openStatusDialog, setOpenStatusDialog] = useState(false);
-  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [otherReason, setOtherReason] = useState("");
   const [newStatus, setNewStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const openMenu = Boolean(anchorEl);
 
-  const handleMenuOpen = (event, orderId) => {
+  const handleMenuClick = (event, id) => {
     setAnchorEl(event.currentTarget);
-    setSelectedOrderId(orderId);
+    setSelectedOrderId(id);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedOrderId(null);
   };
 
-  const filteredOrders = orders
-    .filter(order => {
-      const matchSearch =
-        order.email.toLowerCase().includes(search.toLowerCase()) ||
-        order.id.toString().includes(search);
-      const matchStatus = filterStatus ? order.status === filterStatus : true;
-      return matchSearch && matchStatus;
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-    });
-
-  const handleUpdateStatus = () => {
-    alert(`Đơn ${selectedOrderId} đã cập nhật trạng thái thành: ${newStatus}`);
-    setOpenStatusDialog(false);
-    handleMenuClose();
-    setNewStatus("");
+  const fetchOrders = async (page = 1) => {
+    try {
+      const res = await adminOrderService.getOrders({
+        search,
+        status,
+        sort: sortOrder,
+        fromDate,
+        toDate,
+        payment_status: paymentStatus,
+        page,
+      });
+      setOrders(res.data.data || []);
+      setTotalPages(res.data.totalPages || 1);
+      setCurrentPage(page);
+    } catch (err) {
+      toast.error("Lỗi khi tải đơn hàng");
+    }
   };
 
-  const handleCancelOrder = () => {
-    const reason = cancelReason === "Khác" ? otherReason : cancelReason;
-    alert(`Đã hủy đơn ${selectedOrderId} với lý do: ${reason}`);
-    setOpenCancelDialog(false);
-    handleMenuClose();
-    setCancelReason("");
-    setOtherReason("");
+  useEffect(() => {
+    fetchOrders(currentPage);
+  }, [search, status, sortOrder, fromDate, toDate, paymentStatus]);
+
+  const mapStatus = (s) =>
+    ({
+      0: "Chờ xác nhận",
+      1: "Đã xác nhận",
+      2: "Đang giao",
+      3: "Đã giao",
+      4: "Đã hủy",
+    }[s] || "Không rõ");
+
+  const mapPayment = (s) =>
+    ({
+      paid: "Đã thanh toán",
+      pending: "Chưa thanh toán",
+      failed: "Thất bại",
+    }[s] || "Không rõ");
+
+  const handleCancel = async () => {
+    const reason = cancelReason === "Khác" ? otherReason.trim() : cancelReason;
+    if (!reason) {
+      toast.error("Vui lòng nhập lý do hủy đơn");
+      return;
+    }
+
+    try {
+      await adminOrderService.cancelOrder(selectedOrderId, reason);
+      toast.success("Đã hủy đơn");
+      fetchOrders();
+      setOpenCancel(false);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Hủy đơn thất bại");
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (newStatus === "") {
+      toast.error("Vui lòng chọn trạng thái mới");
+      return;
+    }
+
+    try {
+      await adminOrderService.updateOrderStatus(selectedOrderId, parseInt(newStatus));
+      toast.success("Cập nhật trạng thái thành công");
+      fetchOrders();
+      setOpenStatus(false);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Lỗi cập nhật trạng thái");
+    }
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" mb={2}>Danh sách đơn hàng</Typography>
+    <Box p={3}>
+      <Typography variant="h5" mb={2}>
+        Danh sách đơn hàng
+      </Typography>
 
-      <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" mb={2}>
-        {statusFilters.map((filter) => (
+      <Stack direction="row" spacing={2} mb={2} flexWrap="wrap">
+        {statusFilters.map((f) => (
           <Button
-            key={filter.label}
-            startIcon={filter.icon}
-            variant={filterStatus === filter.value ? "contained" : "outlined"}
-            color={filterStatus === filter.value ? "primary" : "inherit"}
-            onClick={() => setFilterStatus(filter.value)}
+            key={f.label}
+            variant={status === f.value ? "contained" : "outlined"}
+            color={f.color}
+            onClick={() => setStatus(f.value)}
+            startIcon={f.icon}
           >
-            {filter.label}
+            {f.label}
           </Button>
         ))}
-
-      
       </Stack>
-      <Grid container spacing={2} mb={2} alignItems="center">
-        <Grid item xs={12} md={6}>
+
+      <Grid container spacing={2} mb={2}>
+        <Grid item xs={12} md={4}>
           <TextField
             fullWidth
-            placeholder="Tìm theo email hoặc mã đơn hàng"
-            variant="outlined"
+            placeholder="Tìm theo email hoặc mã đơn"
             size="small"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <Search />
                 </InputAdornment>
-              )
+              ),
             }}
           />
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid item xs={6} md={2}>
           <FormControl fullWidth size="small">
-            <InputLabel>Sắp xếp theo ngày</InputLabel>
+            <InputLabel>Sắp xếp</InputLabel>
             <Select
               value={sortOrder}
               label="Sắp xếp"
@@ -160,26 +203,37 @@ const OrderList = () => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid item xs={6} md={2}>
           <TextField
             fullWidth
             size="small"
-            type="date"
             label="Từ ngày"
+            type="date"
             InputLabelProps={{ shrink: true }}
+            onChange={(e) => setFromDate(e.target.value)}
           />
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid item xs={6} md={2}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Đến ngày"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={6} md={2}>
           <FormControl fullWidth size="small">
             <InputLabel>Thanh toán</InputLabel>
             <Select
-              value=""
+              value={paymentStatus}
               label="Thanh toán"
-              // onChange={} // optional handler
+              onChange={(e) => setPaymentStatus(e.target.value)}
             >
               <MenuItem value="">Tất cả</MenuItem>
-              <MenuItem value="Chưa thanh toán">Chưa thanh toán</MenuItem>
-              <MenuItem value="Đã thanh toán">Đã thanh toán</MenuItem>
+              <MenuItem value="paid">Đã thanh toán</MenuItem>
+              <MenuItem value="pending">Chưa thanh toán</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -189,7 +243,7 @@ const OrderList = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Mã đơn</TableCell>
+              <TableCell align="center" sx={{ width: "60px" }}>#</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Ngày đặt</TableCell>
               <TableCell>Tổng tiền</TableCell>
@@ -199,122 +253,88 @@ const OrderList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredOrders.map(order => (
-              <TableRow key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.email}</TableCell>
-                <TableCell>{order.date}</TableCell>
-                <TableCell>{order.total.toLocaleString()} VNĐ</TableCell>
-                <TableCell>
-                  <Chip label={order.status} color="warning" />
-                </TableCell>
-                <TableCell>{order.payment}</TableCell>
-                <TableCell>
-                  <IconButton onClick={(e) => handleMenuOpen(e, order.id)}>
-                    <MoreVertIcon />
-                  </IconButton>
-                </TableCell>
+            {orders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">Không có kết quả nào</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              orders.map((item, index) => (
+                <TableRow key={item.id || index}>
+                  <TableCell align="center">{index + 1}</TableCell>
+                  <TableCell>{item.customer?.email}</TableCell>
+                  <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>{item.total_price?.toLocaleString?.() ?? '0'} ₫</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={mapStatus(item.status)}
+                      color={statusFilters.find(f => f.value === item.status)?.color || 'default'}
+                      variant="outlined"
+                    />
+                  </TableCell>
+                  <TableCell>{mapPayment(item.payment_status)}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={(e) => handleMenuClick(e, item.id)}>
+                      <MoreVert />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="center" mt={3}>
-        <Pagination count={5} color="primary" />
-      </Box>
+      <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+        <MenuItem onClick={() => {
+          navigate(`/admin/orders/${selectedOrderId}`);
+          handleMenuClose();
+        }}>
+          <Visibility fontSize="small" sx={{ mr: 1 }} /> Xem chi tiết
+        </MenuItem>
+        <MenuItem onClick={() => {
+          setOpenStatus(true);
+          handleMenuClose();
+        }}>
+          <Update fontSize="small" sx={{ mr: 1 }} /> Cập nhật trạng thái
+        </MenuItem>
+        <MenuItem onClick={() => {
+          const order = orders.find((o) => o.id === selectedOrderId);
+          if (!order) return toast.error("Không tìm thấy đơn hàng");
 
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-  <MenuItem
-    onClick={() => {
-      navigate(`/admin/orders/${selectedOrderId}`);
-      handleMenuClose();
-    }}
-  >
-    <VisibilityIcon fontSize="small" style={{ marginRight: 8 }} />
-    Xem chi tiết
-  </MenuItem>
+          if ([2, 3, 4].includes(order.status)) return toast.error("Không thể hủy đơn hàng ở trạng thái hiện tại");
+          if (order.payment_status === "paid") return toast.error("Đơn đã thanh toán, không thể hủy");
 
-  <MenuItem
-    onClick={() => {
-      setOpenStatusDialog(true);
-      handleMenuClose();
-    }}
-  >
-    <UpdateIcon fontSize="small" style={{ marginRight: 8 }} />
-    Cập nhật trạng thái
-  </MenuItem>
+          setOpenCancel(true);
+          handleMenuClose();
+        }}>
+          <Cancel fontSize="small" sx={{ mr: 1 }} /> Hủy đơn
+        </MenuItem>
+      </Menu>
 
-  <MenuItem
-    onClick={() => {
-      setOpenCancelDialog(true);
-      handleMenuClose();
-    }}
-  >
-    <CancelIcon fontSize="small" style={{ marginRight: 8 }} />
-    Hủy đơn
-  </MenuItem>
-</Menu>
-<Dialog open={openStatusDialog} onClose={() => setOpenStatusDialog(false)}>
-  <DialogTitle sx={{ fontSize: '20px', fontWeight: 'bold' }}>Cập nhật trạng thái</DialogTitle>
-  <DialogContent sx={{ minWidth: 400 }}>
-    <FormControl fullWidth sx={{ mt: 1 }}>
-      <InputLabel>Trạng thái mới</InputLabel>
-      <Select
-        value={newStatus}
-        label="Trạng thái mới"
-        onChange={(e) => setNewStatus(e.target.value)}
-      >
-        <MenuItem value="Chờ xác nhận">Chờ xác nhận</MenuItem>
-        <MenuItem value="Đã xác nhận">Đã xác nhận</MenuItem>
-        <MenuItem value="Đang giao">Đang giao</MenuItem>
-        <MenuItem value="Đã giao">Đã giao</MenuItem>
-        <MenuItem value="Đã hủy">Đã hủy</MenuItem>
-      </Select>
-    </FormControl>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenStatusDialog(false)}>Hủy</Button>
-    <Button variant="contained" onClick={handleUpdateStatus} disabled={!newStatus}>
-      Xác nhận
-    </Button>
-  </DialogActions>
-</Dialog>
-
-<Dialog open={openCancelDialog} onClose={() => setOpenCancelDialog(false)}>
-  <DialogTitle sx={{ fontSize: '20px', fontWeight: 'bold' }}>Hủy đơn hàng</DialogTitle>
-  <DialogContent sx={{ minWidth: 400 }}>
-    <Typography mb={1}>Chọn lý do hủy đơn:</Typography>
-    <RadioGroup value={cancelReason} onChange={(e) => setCancelReason(e.target.value)}>
-      <FormControlLabel value="Không liên hệ được" control={<Radio />} label="Không liên hệ được" />
-      <FormControlLabel value="Khách đổi ý" control={<Radio />} label="Khách đổi ý" />
-      <FormControlLabel value="Hết hàng" control={<Radio />} label="Hết hàng" />
-      <FormControlLabel value="Khác" control={<Radio />} label="Khác" />
-    </RadioGroup>
-    {cancelReason === "Khác" && (
-      <TextField
-        fullWidth
-        placeholder="Nhập lý do khác"
-        size="small"
-        sx={{ mt: 2 }}
-        value={otherReason}
-        onChange={(e) => setOtherReason(e.target.value)}
+      <PaginationComponent
+        totalPages={totalPages}
+        currentPage={currentPage}
+        onChange={(page) => fetchOrders(page)}
       />
-    )}
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={() => setOpenCancelDialog(false)}>Hủy</Button>
-    <Button
-      variant="contained"
-      color="error"
-      onClick={handleCancelOrder}
-      disabled={!cancelReason || (cancelReason === "Khác" && !otherReason)}
-    >
-      Xác nhận hủy
-    </Button>
-  </DialogActions>
-</Dialog>
 
+      <UpdateStatusDialog
+        open={openStatus}
+        onClose={() => setOpenStatus(false)}
+        orderId={selectedOrderId}
+        value={newStatus}
+        onChange={(e) => setNewStatus(e.target.value)}
+        onConfirm={handleUpdate}
+      />
+
+      <CancelOrderDialog
+        open={openCancel}
+        onClose={() => setOpenCancel(false)}
+        cancelReason={cancelReason}
+        setCancelReason={setCancelReason}
+        otherReason={otherReason}
+        setOtherReason={setOtherReason}
+        onConfirm={handleCancel}
+      />
     </Box>
   );
 };

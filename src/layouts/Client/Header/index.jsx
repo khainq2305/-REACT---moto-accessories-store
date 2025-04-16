@@ -1,10 +1,28 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState,  useEffect } from 'react';
+
+import SearchBox from './SearchBox';
+import CartBox from './CartBox';
 
 
 const Header = () => {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser && storedUser !== "undefined") {
+        setUser(JSON.parse(storedUser));
+      } else {
+        localStorage.removeItem("user"); // xoá nếu sai format
+      }
+    } catch (err) {
+      console.error("❌ JSON parse lỗi:", err);
+      localStorage.removeItem("user"); // clean up nếu lỗi JSON
+    }
+  }, []);
+  
   const toggleSearch = () => {
     setOpen(!open);
     document.body.classList.toggle('modal-open', !open);
@@ -67,14 +85,34 @@ const Header = () => {
                 Hỗ trợ
               </a>
             </li>
-            <li className="header__nav-item header__nav-item--bold header__nav-item--separate">
-  <Link to="/register" className="header__nav-item-link">Đăng ký</Link>
-</li>
+            {user ? (
+  <li className="header__nav-item header__nav-user">
+    <div className="header__nav-user-avatar">
+      <div className="user-avatar-icon">
+        {user.email?.charAt(0).toUpperCase()}
+      </div>
+      <span className="user-name">{user.email?.split('@')[0]}</span>
+    </div>
+    <ul className="header__nav-user-menu">
+      <li><Link to="/account">Tài Khoản Của Tôi</Link></li>
+      <li><Link to="/account/orders">Đơn Mua</Link></li>
+      <li onClick={() => {
+        localStorage.clear();
+        window.location.href = '/';
+      }}>Đăng Xuất</li>
+    </ul>
+  </li>
+) : (
+  <>
+    <li className="header__nav-item header__nav-item--bold header__nav-item--separate">
+      <Link to="/register" className="header__nav-item-link">Đăng ký</Link>
+    </li>
+    <li className="header__nav-item header__nav-item--bold">
+      <Link to="/login" className="header__nav-item-link">Đăng nhập</Link>
+    </li>
+  </>
+)}
 
-            <li className="header__nav-item header__nav-item--bold">
-            <Link to="/login" className="header__nav-item-link">Đăng nhập</Link>
-
-            </li>
           </ul>
         </nav>
 
@@ -191,35 +229,7 @@ const Header = () => {
 
           <div className="header__icon-group" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
   {/* 🔍 Search SVG */}
-{/* Icon search trigger */}
-<div className="header__svg-icon" onClick={toggleSearch} style={{ cursor: 'pointer' }}>
-        <svg
-          role="presentation"
-          strokeWidth="2"
-          stroke="white"
-          fill="white"
-          width="22"
-          height="22"
-          viewBox="0 0 22 22"
-        >
-          <circle cx="11" cy="10" r="7" fill="none"></circle>
-          <path d="m16 15 3 3" strokeLinecap="round" strokeLinejoin="round"></path>
-        </svg>
-      </div>
-
-      {/* Overlay search input */}
-      <div className={`search-overlay ${open ? 'open' : ''}`}>
-        <div className="row-search-overlay">
-          <input type="text" placeholder="Tìm..." />
-          <span className="overlay-close" onClick={toggleSearch}>✕</span>
-        </div>
-        <div className="search-results">
-          <p>Giao diện tĩnh - không có kết quả</p>
-        </div>
-      </div>
-
-      {/* Background overlay */}
-      {open && <div className="overlay-search" onClick={toggleSearch}></div>}
+  <SearchBox open={open} toggleSearch={toggleSearch} />
   {/* 👤 Account SVG */}
   <Link to="/login" className="header__svg-icon">
     <svg role="presentation" strokeWidth="2" width="22" stroke="white" fill="white" height="22" viewBox="0 0 22 22">
@@ -228,43 +238,7 @@ const Header = () => {
     </svg>
     </Link>
 
-  {/* 🛒 Cart (giữ nguyên SVG cũ của bạn hoặc FontAwesome) */}
-  <div className="header__cart header__cart--has-cart">
-    <svg role="presentation" stroke="white" fill="white" strokeWidth="2" width="22" height="22" viewBox="0 0 22 22">
-      <path
-        d="M11 7H3.577A2 2 0 0 0 1.64 9.497l2.051 8A2 2 0 0 0 5.63 19H16.37a2 2 0 0 0 1.937-1.503l2.052-8A2 2 0 0 0 18.422 7H11Zm0 0V1"
-        fill="none"
-     
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      ></path>
-    </svg>
-    <div className="header__cart-list has-cart">
-  <h4 className="header__cart-heading">Sản phẩm đã chọn</h4>
-  <ul className="header__cart-list-item">
-    <li className="header__cart-item">
-      <img src="/Client/img/buy/1.PNG" className="header__cart-item-img" alt="item1" />
-      <div className="header__cart-item-info">
-        <div className="header__cart-item-heading">
-          <h3 className="header__cart-item-name">Thanh Thanh 2000 1m57 46kg 88-62-89</h3>
-          <p className="header__cart-item-price">2.000.000đ</p>
-        </div>
-        <div className="header__cart-item-body">
-          <p className="header__cart-item-number">x 2</p>
-          <div className="header__cart-item-close">Xoá <i className="fas fa-times"></i></div>
-        </div>
-      </div>
-    </li>
-  </ul>
-  <div className="header__cart-footer">
-  <Link to="/cart" className="btn btn--primary header__cart-see-cart">Xem giỏ hàng</Link>
-
-  </div>
-</div>
-
-    <div className="header__cart-count">4</div>
-   
-  </div>
+    <CartBox />
 </div>
 
         </div>

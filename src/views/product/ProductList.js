@@ -1,222 +1,259 @@
-import { useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Chip, IconButton, Menu, MenuItem, TextField, Select, MenuItem as MuiMenuItem, Pagination } from "@mui/material";
+import {
+  Box, Button, Chip, Grid, IconButton, InputAdornment,
+  Menu, MenuItem, Paper, Select, Stack, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow, TextField,
+  Typography
+} from "@mui/material";
+import {
+  Delete, Restore, Edit, DeleteForever, MoreVert,
+  Search as SearchIcon
+} from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { toast } from "react-toastify";
+import { format } from "date-fns";
 
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ConfirmDialog from "../../components/ConfirmDialog"; // Import hộp thoại xác nhận
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded'; // thay cho Edit
-import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded'; // thay cho Delete
+import ConfirmDialog from "../../components/ConfirmDialog";
+import PaginationComponent from "../../components/Pagination";
+import { productService } from "../../services/productService";
 
 const ProductList = () => {
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [sortOrder, setSortOrder] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [currentTab, setCurrentTab] = useState("all");
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [products, setProducts] = useState([
-    { id: 1, name: "Đĩa KingSpeed 260mm", price: 2500000, discountPrice: 2200000, category: "Đĩa xe máy", quantity: 15, status: "Còn hàng", image: "https://shop2banh.vn/images/thumbs/2022/04/che-ket-nuoc-cnc-anode-cho-honda-shvn-2020-products-1727.jpg" },
-    { id: 2, name: "Phuộc xe máy", price: 500000, discountPrice: 450000, category: "Phuộc xe máy", quantity: 30, status: "Hết hàng", image: "https://shop2banh.vn/images/thumbs/2024/10/tay-thang-gh-racing-cnc-cho-honda-sh-products-2337.jpg" },
-  ]);
-const [fromDate, setFromDate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
+  const openMenu = Boolean(anchorEl);
 
-  const handleClick = (event, product) => {
-    setAnchorEl(event.currentTarget);
+  const fetchCategories = async () => {
+    try {
+      const res = await productService.getCategories();
+      setCategories(res.data?.data || []);
+    } catch (err) {
+      console.error("❌ Lỗi fetchCategories:", err);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const filters = {
+        page: currentPage,
+        search: searchText,
+        sort: sortOrder,
+        category: selectedCategory,
+        deleted: currentTab === "deleted" ? "true" : "",
+        status: statusFilter || undefined,
+      };
+
+      if (selectedDate) {
+        filters[currentTab === "deleted" ? "deletedAt" : "createdAt"] =
+          format(selectedDate, "yyyy-MM-dd");
+      }
+
+      const res = await productService.getProductList(filters);
+      const data = res.data?.data || [];
+      setProducts(data.map(p => ({ ...p, finalPrice: p.price - p.discount })));
+      setTotalPages(res.data?.totalPages || 1);
+    } catch (err) {
+      console.error("❌ Lỗi fetchProducts:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [searchText, selectedCategory, sortOrder, selectedDate, currentTab, statusFilter, currentPage]);
+
+  const handleMenuClick = (e, product) => {
+    setAnchorEl(e.currentTarget);
     setSelectedProduct(product);
   };
 
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
     setSelectedProduct(null);
   };
 
-  const handleDelete = () => {
-    ConfirmDialog({
+  const handleTabChange = (tab) => {
+    setCurrentTab(tab);
+    setStatusFilter(tab === "active" ? "1" : tab === "inactive" ? "0" : "");
+    setCurrentPage(1);
+  };
+
+  const handleDelete = async () => {
+    console.log("👉 Gọi handleDelete cho ID:", selectedProduct?.id); // ⚠️ THÊM DÒNG NÀY
+    const result = await ConfirmDialog({
       title: "Xác nhận xóa",
-      text: `Bạn có chắc chắn muốn xóa sản phẩm "${selectedProduct?.name}" không?`,
-      onConfirm: () => {
-        setProducts(products.filter((product) => product.id !== selectedProduct.id));
-      }
+      text: `Bạn có chắc chắn muốn xóa sản phẩm "${selectedProduct.name}"?`,
     });
-    handleClose();
+  
+    if (result) {
+      try {
+        await productService.deleteProduct(selectedProduct.id);
+        toast.success("Đã chuyển sản phẩm vào thùng rác");
+        fetchProducts();
+      } catch (error) {
+        toast.error("Xóa thất bại");
+        console.error("🔥 Xóa thất bại:", error.response?.data || error.message);
+      }
+    }
+  
+    handleMenuClose();
+  };
+  
+  
+
+  const handleRestore = async () => {
+    await productService.restoreProduct(selectedProduct.id);
+    toast.success("Đã khôi phục sản phẩm");
+    fetchProducts();
+    handleMenuClose();
+  };
+
+  const handlePermanentDelete = async () => {
+    const result = await ConfirmDialog({
+      title: "Xóa vĩnh viễn",
+      text: `Bạn có chắc muốn xóa vĩnh viễn "${selectedProduct.name}"?`,
+    });
+    if (result) {
+      await productService.permanentDeleteProduct(selectedProduct.id);
+      toast.success("Đã xóa vĩnh viễn");
+      fetchProducts();
+    }
+    handleMenuClose();
   };
 
   return (
-    <div>
-      <h2>Danh sách sản phẩm</h2>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-  <div style={{ 
-    display: "grid", 
-    gridTemplateColumns: "3fr 2fr 2fr 2fr 2fr",
+    <Box p={3}>
+      <Typography variant="h5" mb={2}>Danh sách sản phẩm</Typography>
 
-    gap: "10px", 
-    marginBottom: "10px" 
-  }}>
-    <TextField
-      label="Tìm kiếm sản phẩm"
-      variant="outlined"
-      placeholder="Nhập tên sản phẩm..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      fullWidth
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon color="action" />
-          </InputAdornment>
-        ),
-      }}
-    />
+      <Stack direction="row" spacing={1} mb={2}>
+        {["all", "active", "inactive", "deleted"].map(tab => (
+          <Button
+            key={tab}
+            variant={currentTab === tab ? "contained" : "outlined"}
+            color={tab === "deleted" ? "error" : "primary"}
+            onClick={() => handleTabChange(tab)}
+          >
+            {{
+              all: "Tất cả",
+              active: "Còn hàng",
+              inactive: "Hết hàng",
+              deleted: "Thùng rác"
+            }[tab]}
+          </Button>
+        ))}
+      </Stack>
 
-    <Select
-      value={categoryFilter}
-      onChange={(e) => setCategoryFilter(e.target.value)}
-      displayEmpty
-      variant="outlined"
-      fullWidth
-    >
-      <MuiMenuItem value="">Tất cả danh mục</MuiMenuItem>
-      <MuiMenuItem value="Đĩa xe máy">Đĩa xe máy</MuiMenuItem>
-      <MuiMenuItem value="Phuộc xe máy">Phuộc xe máy</MuiMenuItem>
-    </Select>
+      <Grid container spacing={2} mb={2}>
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            fullWidth size="small" label="Tìm kiếm"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Select fullWidth size="small" value={selectedCategory} displayEmpty onChange={(e) => setSelectedCategory(e.target.value)}>
+            <MenuItem value="">Tất cả danh mục</MenuItem>
+            {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
+          </Select>
+        </Grid>
+        <Grid item xs={6} md={2}>
+          <Select fullWidth size="small" value={sortOrder} displayEmpty onChange={(e) => setSortOrder(e.target.value)}>
+            <MenuItem value="">Sắp xếp</MenuItem>
+            <MenuItem value="asc">Giá tăng dần</MenuItem>
+            <MenuItem value="desc">Giá giảm dần</MenuItem>
+          </Select>
+        </Grid>
+        <Grid item xs={6} md={2}>
+          <Select fullWidth size="small" value={statusFilter} displayEmpty onChange={(e) => setStatusFilter(e.target.value)}>
+            <MenuItem value="">Tất cả trạng thái</MenuItem>
+            <MenuItem value="1">Còn hàng</MenuItem>
+            <MenuItem value="0">Hết hàng</MenuItem>
+          </Select>
+        </Grid>
+      </Grid>
 
-    <Select
-      value={""}
-      onChange={() => {}}
-      displayEmpty
-      variant="outlined"
-      fullWidth
-    >
-      <MuiMenuItem value="">Sắp xếp theo giá</MuiMenuItem>
-      <MuiMenuItem value="asc">Giá tăng dần</MuiMenuItem>
-      <MuiMenuItem value="desc">Giá giảm dần</MuiMenuItem>
-    </Select>
-    <Select
-  value={""} // Cần thêm state nếu cần xử lý thật
-  onChange={() => {}} // Placeholder
-  displayEmpty
-  variant="outlined"
-  fullWidth
->
-  <MuiMenuItem value="">Tất cả trạng thái</MuiMenuItem>
-  <MuiMenuItem value="Còn hàng">Còn hàng</MuiMenuItem>
-  <MuiMenuItem value="Hết hàng">Hết hàng</MuiMenuItem>
-</Select>
-
-    <DatePicker
-      label="Ngày tạo"
-      value={fromDate}
-      onChange={(newValue) => setFromDate(newValue)}
-      renderInput={(params) => <TextField {...params} fullWidth />}
-    />
-  </div>
-</LocalizationProvider>
-
-
-<Button
-  variant="contained"
-  color="error"
-  startIcon={<DeleteOutlineIcon />}
-  onClick={() => navigate("/admin/products/trash")}
-
->
-  Thùng rác
-</Button>
-
-      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
-              <TableCell>Hình ảnh</TableCell>
-              <TableCell>Tên sản phẩm</TableCell>
+              <TableCell>Hình</TableCell>
+              <TableCell>Tên</TableCell>
               <TableCell>Giá</TableCell>
-              <TableCell>Giá giảm</TableCell>
+              <TableCell>Giảm</TableCell>
               <TableCell>Danh mục</TableCell>
-              <TableCell>Số lượng</TableCell>
+              <TableCell>SL</TableCell>
               <TableCell>Trạng thái</TableCell>
-              <TableCell>Hành động</TableCell>
+              <TableCell>Thao tác</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map((product, index) => (
-              <TableRow key={product.id}>
+            {products.map((p, index) => (
+              <TableRow key={p.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-  <img
-    src={product.image}
-    alt={product.name}
-    style={{
-      width: 60,
-      height: 60,
-      objectFit: 'cover',
-      borderRadius: 8, // 👈 nếu muốn bo góc nhẹ
-      border: '1px solid #eee'
-    }}
-  />
-</TableCell>
-
-                <TableCell>{product.name}</TableCell>
-                <TableCell>{product.price.toLocaleString()} VND</TableCell>
-                <TableCell>{product.discountPrice.toLocaleString()} VND</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.quantity} cái</TableCell>
+                  <img src={`http://localhost:3000/uploads/${p.image}`} alt="" style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 4 }} />
+                </TableCell>
+                <TableCell>{p.name}</TableCell>
+                <TableCell>{p.price.toLocaleString()} ₫</TableCell>
+                <TableCell>{p.discount > 0 ? p.finalPrice.toLocaleString() + " ₫" : "—"}</TableCell>
+                <TableCell>{p.category?.name}</TableCell>
+                <TableCell>{p.quantity}</TableCell>
                 <TableCell>
-                  <Chip label={product.status} color={product.status === "Còn hàng" ? "success" : "warning"} />
+                  <Chip label={p.status ? "Còn hàng" : "Hết hàng"} color={p.status ? "success" : "warning"} />
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(event) => handleClick(event, product)}>
-                    <MoreVertIcon />
-                  </IconButton>
+                  <IconButton onClick={(e) => handleMenuClick(e, p)}><MoreVert /></IconButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        {products.length === 0 && (
+          <Typography textAlign="center" p={2}>Không có sản phẩm phù hợp</Typography>
+        )}
       </TableContainer>
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
-        <Pagination count={5} color="primary" />
-      </div>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-  <MenuItem
-    onClick={() => navigate(`/admin/products/edit/${selectedProduct?.id}`)}
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 1.5,
-      fontWeight: 500,
-      color: '#1e88e5',
-      px: 2,
-      py: 1.5,
-    }}
-  >
-    <BorderColorRoundedIcon sx={{ fontSize: 20 }} />
-    Sửa
-  </MenuItem>
 
-  <MenuItem
-    onClick={handleDelete}
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: 1.5,
-      fontWeight: 500,
-      color: 'red',
-      px: 2,
-      py: 1.5,
-    }}
-  >
-    <DeleteForeverRoundedIcon sx={{ fontSize: 20 }} />
-    Xóa
-  </MenuItem>
-</Menu>
+      <PaginationComponent totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />
 
-    </div>
+      <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+        {currentTab !== "deleted" ? (
+          <div>
+            <MenuItem onClick={() => navigate(`/admin/products/edit/${selectedProduct?.id}`)}>
+              <Edit fontSize="small" sx={{ mr: 1 }} /> Chỉnh sửa
+            </MenuItem>
+            <MenuItem onClick={handleDelete}>
+              <Delete fontSize="small" sx={{ mr: 1 }} /> Xóa
+            </MenuItem>
+          </div>
+        ) : (
+          <div>
+            <MenuItem onClick={handleRestore}>
+              <Restore fontSize="small" sx={{ mr: 1 }} /> Khôi phục
+            </MenuItem>
+            <MenuItem onClick={handlePermanentDelete}>
+              <DeleteForever fontSize="small" sx={{ mr: 1 }} /> Xóa vĩnh viễn
+            </MenuItem>
+          </div>
+        )}
+      </Menu>
+    </Box>
   );
 };
 
