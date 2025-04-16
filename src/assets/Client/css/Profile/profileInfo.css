@@ -1,0 +1,117 @@
+.profile-info-wrapper {
+    display: flex;
+    justify-content: space-between;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #efefef;
+    border-radius: 4px;
+    margin-top: 24px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .profile-info-left {
+    width: 70%;
+  }
+  
+  .profile-info-left h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .profile-info-left p {
+    color: #888;
+    margin-bottom: 24px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    outline: none;
+  }
+  
+  .inline-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .inline-group input[type="radio"] {
+    margin-right: 4px;
+  }
+  
+  .select-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  
+  .select-group select {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+  }
+  
+  .btn-save {
+    background-color: #ee4d2d;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    margin-top: 12px;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  
+  .btn-save:hover {
+    background-color: #d74428;
+  }
+  
+  .profile-info-right {
+    text-align: center;
+    width: 30%;
+  }
+  
+  .avatar-circle {
+    width: 120px;
+    height: 120px;
+    background-color: #ee4d2d;
+    border-radius: 50%;
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+  }
+  
+  .avatar-upload {
+    margin-top: 12px;
+  }
+  
+  .avatar-upload button {
+    padding: 6px 16px;
+    border: 1px solid #333;
+    background: white;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+  
+  .avatar-upload small {
+    display: block;
+    margin-top: 6px;
+    color: #666;
+    font-size: 12px;
+  }
+  

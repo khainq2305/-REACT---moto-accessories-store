@@ -27,7 +27,17 @@
     width: 10%;
     text-align: center;
   }
-  
+  header{
+    background: linear-gradient(135deg, #1a1a1a, #2e2e2e, #8b0000) !important;
+
+
+
+
+
+
+
+
+  }
   .cart-container .cart-item__action {
     width: 10%;
     text-align: center;

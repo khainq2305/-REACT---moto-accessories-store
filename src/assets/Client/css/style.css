@@ -12,6 +12,61 @@
     background-image: linear-gradient(to right, #f53d2d, #ff6633);
    
 }
+.header__nav-user {
+    position: relative;
+    cursor: pointer;
+  }.user-name {
+    max-width: 150px; /* hoặc bao nhiêu tùy theo layout */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .header__nav-user-avatar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+  }
+  .user-avatar-icon {
+    background-color: #f60;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  .header__nav-user-menu {
+    display: none;
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: white;
+    color: black;
+    list-style: none;
+  
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    min-width: 130px;
+    z-index: 10;
+  }
+  
+  .header__nav-user:hover .header__nav-user-menu {
+    display: block;
+  }
+  .header__nav-user-menu li {
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+  .header__nav-user-menu li:hover {
+    background-color: #f5f5f5;
+  }
+  
 .header__navbar-item--has-dropdown {
     position: relative;
   }
@@ -164,7 +219,7 @@
     right: 0;
     margin-top: 8px;
     width: 150px;
-    height: 120px;
+    
     background-color: var(--white-color);
     list-style: none;
     z-index: 10;
@@ -1327,10 +1382,7 @@ border-color: red green blue yellow */
     padding-left: 0;
 }
 
-.footer {
- 
-    padding-top: 120px;
-}
+
 
 .main-footer {
     background-color: #f9f9f9;
