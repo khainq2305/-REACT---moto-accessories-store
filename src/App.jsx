@@ -33,6 +33,19 @@ function App() {
           theme="colored"
         />
       </BrowserRouter>
+
+      {/* ✅ Khu vực hiển thị Toast */}
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </ThemeProvider>
   );
 }

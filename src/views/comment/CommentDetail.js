@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   Card,
@@ -22,7 +22,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
 } from "@mui/material";
 
 import SearchIcon from "@mui/icons-material/Search";
@@ -30,25 +30,13 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import ReplyIcon from "@mui/icons-material/Reply";
-
-const mockData = [
-  {
-    id: 1,
-    productId: 101,
-    user: "Nguyễn Văn A",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    rating: 4,
-    content: "Sản phẩm rất tốt!",
-    date: "2024-03-24",
-    reply: "Cảm ơn bạn đã ủng hộ!",
-    replyDate: "2024-03-25",
-  },
-  // Các dữ liệu còn lại giữ nguyên...
-];
+import { getCommentsByProduct } from "../../services/commentServices";
 
 const CommentDetail = () => {
   const { productId } = useParams();
 
+  const [comments, setComments] = useState([]);
+  const [productName, setProductName] = useState("");
   const [searchText, setSearchText] = useState("");
   const [selectedRating, setSelectedRating] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -61,15 +49,32 @@ const CommentDetail = () => {
   const [selectedComment, setSelectedComment] = useState(null);
   const [dialogReplyText, setDialogReplyText] = useState("");
 
-  const productComments = mockData.filter(item => item.productId === parseInt(productId));
-  const filteredData = productComments.filter(item => {
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await getCommentsByProduct(productId);
+        setProductName(res.productName || "Không rõ sản phẩm");
+        setComments(res.comments || []);
+      } catch (err) {
+        console.error("❌ Lỗi khi lấy comment chi tiết:", err);
+      }
+    };
+    fetchComments();
+  }, [productId]);
+  
+
+  const filteredData = comments.filter((item) => {
     const matchesText = item.content.toLowerCase().includes(searchText.toLowerCase());
     const matchesRating = selectedRating === "all" || item.rating === parseInt(selectedRating);
-    const matchesStatus = selectedStatus === "all" || (selectedStatus === "replied" ? !!item.reply : !item.reply);
+    const matchesStatus =
+      selectedStatus === "all" || (selectedStatus === "replied" ? !!item.reply : !item.reply);
     return matchesText && matchesRating && matchesStatus;
   });
 
-  const paginatedData = filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedData = filteredData.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   const handleOpenMenu = (e, row) => {
     setAnchorEl(e.currentTarget);
@@ -104,13 +109,20 @@ const CommentDetail = () => {
         title={
           <Box display="flex" alignItems="center" gap={1}>
             <Typography variant="h6" fontWeight="bold">
-              💬 Chi tiết bình luận - <span style={{ color: "#1976d2" }}>Sản phẩm ID {productId}</span>
+              💬 Chi tiết bình luận - <span style={{ color: "#1976d2" }}>{productName}</span>
             </Typography>
           </Box>
         }
       />
       <CardContent>
-        <Box display="flex" alignItems="center" gap={2} mb={3} flexWrap="wrap" sx={{ backgroundColor: "#f5f5f5", p: 2, borderRadius: 2 }}>
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={2}
+          mb={3}
+          flexWrap="wrap"
+          sx={{ backgroundColor: "#f5f5f5", p: 2, borderRadius: 2 }}
+        >
           <TextField
             variant="outlined"
             label="🔍 Tìm kiếm bình luận"
@@ -123,7 +135,7 @@ const CommentDetail = () => {
                 <InputAdornment position="start">
                   <SearchIcon color="action" />
                 </InputAdornment>
-              )
+              ),
             }}
           />
           <Select
@@ -134,8 +146,10 @@ const CommentDetail = () => {
             sx={{ minWidth: 160, backgroundColor: "white", borderRadius: 1 }}
           >
             <MenuItem value="all">⭐ Tất cả sao</MenuItem>
-            {[5, 4, 3, 2, 1].map(val => (
-              <MenuItem key={val} value={val}>{val} ⭐</MenuItem>
+            {[5, 4, 3, 2, 1].map((val) => (
+              <MenuItem key={val} value={val}>
+                {val} ⭐
+              </MenuItem>
             ))}
           </Select>
           <Select
@@ -167,16 +181,20 @@ const CommentDetail = () => {
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">Không tìm thấy bình luận</TableCell>
+                <TableCell colSpan={8} align="center">
+                  Không tìm thấy bình luận
+                </TableCell>
               </TableRow>
             ) : (
               paginatedData.map((item, index) => (
                 <TableRow key={item.id}>
                   <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                  <TableCell><Avatar src={item.avatar} alt={item.user} /></TableCell>
+                  <TableCell>
+                    <Avatar src={item.avatar} alt={item.user} />
+                  </TableCell>
                   <TableCell>{item.user}</TableCell>
                   <TableCell>
-                    {[1, 2, 3, 4, 5].map(star =>
+                    {[1, 2, 3, 4, 5].map((star) =>
                       star <= item.rating ? (
                         <StarIcon key={star} fontSize="small" color="warning" />
                       ) : (
@@ -186,7 +204,9 @@ const CommentDetail = () => {
                   </TableCell>
                   <TableCell>
                     <Typography fontSize={14}>{item.content}</Typography>
-                    <Typography fontSize={12} color="text.secondary">{item.date}</Typography>
+                    <Typography fontSize={12} color="text.secondary">
+                      {item.date}
+                    </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography fontWeight={600} color={item.reply ? "green" : "orange"}>
@@ -197,10 +217,16 @@ const CommentDetail = () => {
                     {item.reply ? (
                       <>
                         <Typography>{item.reply}</Typography>
-                        <Typography fontSize={12} color="text.secondary">({item.replyDate})</Typography>
+                        <Typography fontSize={12} color="text.secondary">
+                          ({item.replyDate})
+                        </Typography>
                       </>
                     ) : (
-                      <Typography variant="body2" color="text.secondary" fontStyle="italic">
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontStyle="italic"
+                      >
                         Chưa có phản hồi
                       </Typography>
                     )}
@@ -216,10 +242,11 @@ const CommentDetail = () => {
           </TableBody>
         </Table>
 
-        {/* Giao diện phân trang mới */}
         <Box display="flex" justifyContent="center" gap={2} mt={4}>
           <IconButton disabled>
-            <Typography fontSize="18px" color="text.secondary">❮</Typography>
+            <Typography fontSize="18px" color="text.secondary">
+              ❮
+            </Typography>
           </IconButton>
 
           {[1, 2, 3, 4, 5].map((page) => (
@@ -248,7 +275,9 @@ const CommentDetail = () => {
           ))}
 
           <IconButton>
-            <Typography fontSize="18px" color="text.secondary">❯</Typography>
+            <Typography fontSize="18px" color="text.secondary">
+              ❯
+            </Typography>
           </IconButton>
         </Box>
 
@@ -274,8 +303,12 @@ const CommentDetail = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="error">Hủy</Button>
-            <Button variant="contained" onClick={handleSubmitReply}>Gửi</Button>
+            <Button onClick={handleCloseDialog} color="error">
+              Hủy
+            </Button>
+            <Button variant="contained" onClick={handleSubmitReply}>
+              Gửi
+            </Button>
           </DialogActions>
         </Dialog>
       </CardContent>

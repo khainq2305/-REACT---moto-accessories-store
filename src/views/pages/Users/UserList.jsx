@@ -1,137 +1,81 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
 import {
-  Typography, Box,
-  Table, TableBody, TableCell, TableHead, TableRow,
-  TextField, Select, MenuItem, InputAdornment,
-  FormControl, InputLabel, IconButton, Menu, MenuItem as MuiMenuItem, Chip
-} from '@mui/material';
+  Typography,
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TextField,
+  Select,
+  MenuItem,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  IconButton,
+  Menu,
+  MenuItem as MuiMenuItem,
+  Chip,
+  Button,
+} from "@mui/material";
+import { Tooltip } from "@mui/material";
+import React from "react";
+
 import SearchIcon from "@mui/icons-material/Search";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import LockResetIcon from '@mui/icons-material/LockReset';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import DashboardCard from '../../../components/shared/DashboardCard';
-import ResetPasswordDialog from '../../../components/Dialog/ResetPasswordDialog';
-import UpdateStatusDialog from '../../../components/Dialog/UpdateStatusDialog';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { toast } from "react-toastify";
 
-const users = [
-  {
-    id: "1",
-    avatar: "https://randomuser.me/api/portraits/men/11.jpg",
-    name: "Đặng Tiến Hoàng",
-    email: "virussofficial@gmail.com",
-    phone: "+8401433222",
-    gender: "Nam",
-    birthday: "10/10/1988",
-    status: "0",
-  },
-  {
-    id: "2",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    name: "Nguyễn Thị Mai",
-    email: "mainguyen@gmail.com",
-    phone: "+840912345678",
-    gender: "Nữ",
-    birthday: "02/06/1995",
-    status: "1",
-  },
-  {
-    id: "3",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    name: "Phạm Văn Dũng",
-    email: "dungpham@example.com",
-    phone: "+840912348888",
-    gender: "Nam",
-    birthday: "11/11/1990",
-    status: "1",
-  },
-  {
-    id: "4",
-    avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-    name: "Trần Lệ Hằng",
-    email: "hangtran@gmail.com",
-    phone: "+840934567899",
-    gender: "Nữ",
-    birthday: "18/09/1987",
-    status: "0",
-  },
-  {
-    id: "5",
-    avatar: "https://randomuser.me/api/portraits/men/21.jpg",
-    name: "Lê Trung Hiếu",
-    email: "hieule@gmail.com",
-    phone: "+840912889922",
-    gender: "Nam",
-    birthday: "24/12/1992",
-    status: "1",
-  },
-  {
-    id: "6",
-    avatar: "https://randomuser.me/api/portraits/women/52.jpg",
-    name: "Vũ Quỳnh Như",
-    email: "quynhnhu@example.com",
-    phone: "+840901122233",
-    gender: "Nữ",
-    birthday: "15/03/1996",
-    status: "0",
-  },
-  {
-    id: "7",
-    avatar: "https://randomuser.me/api/portraits/men/77.jpg",
-    name: "Ngô Minh Nhật",
-    email: "nhatngo@gmail.com",
-    phone: "+840987654321",
-    gender: "Nam",
-    birthday: "05/05/1991",
-    status: "1",
-  },
-  {
-    id: "8",
-    avatar: "https://randomuser.me/api/portraits/women/23.jpg",
-    name: "Lâm Thảo Vy",
-    email: "vy.lam@example.com",
-    phone: "+840934567800",
-    gender: "Nữ",
-    birthday: "29/01/1994",
-    status: "1",
-  },
-  {
-    id: "9",
-    avatar: "https://randomuser.me/api/portraits/men/48.jpg",
-    name: "Hoàng Mạnh Cường",
-    email: "cuonghm@gmail.com",
-    phone: "+840932221133",
-    gender: "Nam",
-    birthday: "17/07/1985",
-    status: "0",
-  },
-  {
-    id: "10",
-    avatar: "https://randomuser.me/api/portraits/women/80.jpg",
-    name: "Phan Ngọc Diễm",
-    email: "diemphan@example.com",
-    phone: "+840977665544",
-    gender: "Nữ",
-    birthday: "30/10/1997",
-    status: "1",
-  },
-];
-
+import DashboardCard from "../../../components/shared/DashboardCard";
+import ResetPasswordDialog from "../../../components/Dialog/ResetPasswordDialog";
+import UpdateStatusDialog from "../../../components/Dialog/UpdateStatusDialog";
+import {
+  getUsers,
+  resetUserPassword,
+  updateUserStatus,
+} from "../../../services/userServices";
 
 const UserList = () => {
+  const [users, setUsers] = useState([]);
   const [searchKeyWord, setSearchKeyWord] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [filterGender, setFilterGender] = useState("");
+  const [filterRole, setFilterRole] = useState("");
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [openStatusDialog, setOpenStatusDialog] = useState(false);
   const [newStatus, setNewStatus] = useState("");
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
 
   const open = Boolean(anchorEl);
 
-  const [page] = useState(0);
-  const [rowsPerPage] = useState(5);
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers({
+        search: searchKeyWord,
+        status: filterStatus,
+        gender: filterGender.toLowerCase(),
+        role: filterRole,
+        page,
+        limit: rowsPerPage,
+      });
+      setUsers(response.data.data || []);
+      setTotalPages(response.data.totalPages || 1);
+    } catch (error) {
+      console.error("❌ Lỗi khi lấy danh sách người dùng:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [searchKeyWord, filterStatus, filterGender, filterRole, page]);
 
   const handleMenuClick = (event, user) => {
     setAnchorEl(event.currentTarget);
@@ -142,19 +86,38 @@ const UserList = () => {
     setAnchorEl(null);
   };
 
-  const filteredUsers = users.filter((user) =>
-    (user.name.toLowerCase().includes(searchKeyWord.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchKeyWord.toLowerCase()) ||
-      user.phone.toLowerCase().includes(searchKeyWord.toLowerCase())) &&
-    (filterStatus === "" || user.status === filterStatus) &&
-    (filterGender === "" || user.gender === filterGender)
-  );
+  const handleResetPassword = async () => {
+    try {
+      await resetUserPassword(selectedUser.id);
+      toast.success("✅ Mật khẩu mới đã được gửi qua email");
+      setOpenResetDialog(false);
+    } catch (err) {
+      toast.error("❌ Gửi mật khẩu thất bại");
+    }
+  };
 
-  const paginatedUsers = filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const handleUpdateStatus = async () => {
+    try {
+      await updateUserStatus(selectedUser.id, newStatus);
+      toast.success("✅ Cập nhật trạng thái thành công");
+      setOpenStatusDialog(false);
+      fetchUsers();
+    } catch (err) {
+      toast.error("❌ Cập nhật thất bại");
+    }
+  };
 
   return (
     <DashboardCard title="Danh sách người dùng">
-      <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2, flexWrap: "wrap" }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          alignItems: "center",
+          mb: 2,
+          flexWrap: "wrap",
+        }}
+      >
         <TextField
           sx={{ flex: 2, minWidth: 250 }}
           placeholder="Tìm kiếm người dùng"
@@ -172,7 +135,11 @@ const UserList = () => {
 
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Trạng thái</InputLabel>
-          <Select value={filterStatus} label="Trạng thái" onChange={(e) => setFilterStatus(e.target.value)}>
+          <Select
+            value={filterStatus}
+            label="Trạng thái"
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
             <MenuItem value="">Tất cả</MenuItem>
             <MenuItem value="1">Hoạt động</MenuItem>
             <MenuItem value="0">Tạm ngưng</MenuItem>
@@ -181,140 +148,379 @@ const UserList = () => {
 
         <FormControl size="small" sx={{ minWidth: 140 }}>
           <InputLabel>Giới tính</InputLabel>
-          <Select value={filterGender} label="Giới tính" onChange={(e) => setFilterGender(e.target.value)}>
+          <Select
+            value={filterGender}
+            label="Giới tính"
+            onChange={(e) => setFilterGender(e.target.value)}
+          >
             <MenuItem value="">Tất cả</MenuItem>
-            <MenuItem value="Nam">Nam</MenuItem>
-            <MenuItem value="Nữ">Nữ</MenuItem>
-            <MenuItem value="Khác">Khác</MenuItem>
+            <MenuItem value="male">Nam</MenuItem>
+            <MenuItem value="female">Nữ</MenuItem>
+            <MenuItem value="other">Khác</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 140 }}>
+          <InputLabel>Vai trò</InputLabel>
+          <Select
+            value={filterRole}
+            label="Vai trò"
+            onChange={(e) => setFilterRole(e.target.value)}
+          >
+            <MenuItem value="">Tất cả</MenuItem>
+            <MenuItem value="1">Admin</MenuItem>
+            <MenuItem value="0">Người dùng</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      <Box sx={{ overflow: 'auto', width: { xs: '280px', sm: 'auto' } }}>
-        <Table sx={{ whiteSpace: "nowrap", mt: 2 }}>
+      <Box
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+          "&::-webkit-scrollbar": { display: "none" },
+          scrollbarWidth: "none",
+        }}
+      >
+        <Table
+          sx={{
+            minWidth: 1200,
+            whiteSpace: "nowrap",
+            mt: 2,
+            tableLayout: "auto",
+          }}
+        >
           <TableHead>
             <TableRow>
-              <TableCell align="center"><Typography fontWeight={600}>STT</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Ảnh đại diện</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Họ và tên</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Email</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Số điện thoại</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Giới tính</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Ngày Sinh</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Trạng thái</Typography></TableCell>
-              <TableCell><Typography fontWeight={600}>Hành động</Typography></TableCell>
+              <TableCell align="center">
+                <Typography fontWeight={600}>STT</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={600}>Ảnh đại diện</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={600}>Họ và tên</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={600}>Email</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={600}>Trạng thái</Typography>
+              </TableCell>
+              <TableCell>
+                <Typography fontWeight={600}>Hành động</Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {paginatedUsers.length === 0 ? (
+            {users.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} align="center">
-                  <Typography color="text.secondary" mt={2}>Không tìm thấy nội dung phù hợp</Typography>
+                <TableCell colSpan={10} align="center">
+                  <Typography color="text.secondary" mt={2}>
+                    Không tìm thấy nội dung phù hợp
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedUsers.map((user, index) => (
-                <TableRow key={user.id}>
-                  <TableCell align="center">
-                    <Typography fontSize={15} fontWeight={500}>{page * rowsPerPage + index + 1}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <img src={user.avatar} alt="avatar" style={{ width: 50, height: 50, borderRadius: 8, objectFit: "cover" }} />
-                  </TableCell>
-                  <TableCell><Typography fontWeight={600}>{user.name}</Typography></TableCell>
-                  <TableCell><Typography color="text.secondary">{user.email}</Typography></TableCell>
-                  <TableCell><Typography color="text.secondary">{user.phone}</Typography></TableCell>
-                  <TableCell><Typography color="text.secondary">{user.gender}</Typography></TableCell>
-                  <TableCell><Typography color="text.secondary">{user.birthday}</Typography></TableCell>
-                  <TableCell>
-                    <Chip
-                      label={user.status === "1" ? "Hoạt động" : "Tạm ngưng"}
+              users.map((user, index) => (
+                <React.Fragment key={user.id}>
+                  <TableRow>
+                    <TableCell align="center">
+                      <Typography fontSize={15} fontWeight={500}>
+                        {(page - 1) * rowsPerPage + index + 1}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <img
+                        src={`http://localhost:3000/uploads/${user.avatar}`}
+                        alt="avatar"
+                        style={{
+                          width: 50,
+                          height: 50,
+                          borderRadius: 8,
+                          objectFit: "cover",
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell sx={{ maxWidth: 140, p: 1 }}>
+                      <Tooltip
+                        title={user.name}
+                        placement="top"
+                        arrow
+                        disableInteractive
+                        PopperProps={{
+                          modifiers: [
+                            { name: "offset", options: { offset: [0, 6] } },
+                          ],
+                        }}
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              bgcolor: "#333",
+                              color: "#fff",
+                              fontSize: "0.875rem",
+                              fontWeight: 500,
+                              px: 1.5,
+                              py: 0.5,
+                              borderRadius: 1,
+                            },
+                          },
+                        }}
+                      >
+                        <Typography
+                          fontWeight={600}
+                          sx={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: 140,
+                            display: "block",
+                            cursor: "default",
+                          }}
+                        >
+                          {user.name}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+
+                    <TableCell
                       sx={{
-                        bgcolor: user.status === "1" ? "#d0f2df" : "#fdecea",
-                        color: user.status === "1" ? "#2e7d32" : "#d32f2f",
-                        fontWeight: 600
+                        maxWidth: 180,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton onClick={(e) => handleMenuClick(e, user)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                    >
+                      <Tooltip
+                        title={user.email}
+                        placement="top"
+                        arrow
+                        disableInteractive
+                        PopperProps={{
+                          modifiers: [
+                            {
+                              name: "offset",
+                              options: {
+                                offset: [0, 6],
+                              },
+                            },
+                          ],
+                        }}
+                        componentsProps={{
+                          tooltip: {
+                            sx: {
+                              bgcolor: "#333",
+                              color: "#fff",
+                              fontSize: "0.875rem",
+                              fontWeight: 500,
+                              px: 1.5,
+                              py: 0.5,
+                              borderRadius: 1,
+                            },
+                          },
+                          
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                            cursor: "default",
+                            maxWidth: 180, 
+                          }}
+                        >
+                          {user.email}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={user.status === 1 ? "Hoạt động" : "Tạm ngưng"}
+                        sx={{
+                          bgcolor: user.status === 1 ? "#d0f2df" : "#fdecea",
+                          color: user.status === 1 ? "#2e7d32" : "#d32f2f",
+                          fontWeight: 600,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box display="flex" gap={1} alignItems="center">
+                        <IconButton onClick={(e) => handleMenuClick(e, user)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Button
+                          size="small"
+                          onClick={() =>
+                            setExpandedRow(
+                              expandedRow === user.id ? null : user.id
+                            )
+                          }
+                        >
+                          {expandedRow === user.id ? "Ẩn" : "Chi tiết"}
+                        </Button>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+
+                  {expandedRow === user.id && (
+                    <TableRow>
+                      <TableCell colSpan={10}>
+                        <Box p={2} bgcolor="#f9f9f9" borderRadius={2}>
+                          <Typography
+                            variant="subtitle1"
+                            fontWeight={600}
+                            mb={2}
+                          >
+                            Thông tin bổ sung
+                          </Typography>
+                          <Box
+                            component="dl"
+                            display="grid"
+                            gridTemplateColumns={{
+                              xs: "1fr",
+                              sm: "repeat(2, 1fr)",
+                              md: "repeat(2, 1fr)",
+                            }}
+                            gap={2}
+                          >
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                component="dt"
+                                fontWeight={500}
+                              >
+                                Giới tính:
+                              </Typography>
+                              <Typography variant="body2" component="dd">
+                                {user.gender}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                component="dt"
+                                fontWeight={500}
+                              >
+                                Ngày sinh:
+                              </Typography>
+                              <Typography variant="body2" component="dd">
+                                {user.dob}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                component="dt"
+                                fontWeight={500}
+                              >
+                                Số điện thoại:
+                              </Typography>
+                              <Typography variant="body2" component="dd">
+                                {user.phone}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography
+                                variant="subtitle2"
+                                component="dt"
+                                fontWeight={500}
+                              >
+                                Vai trò:
+                              </Typography>
+                              <Typography variant="body2" component="dd">
+                                {user.role === 1 ? "Admin" : "Người dùng"}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             )}
           </TableBody>
         </Table>
 
         <Box display="flex" justifyContent="center" gap={2} mt={4}>
-          <IconButton disabled>
-            <Typography fontSize="18px" color="text.secondary">❮</Typography>
+          <IconButton disabled={page === 1} onClick={() => setPage(page - 1)}>
+            <Typography fontSize="18px" color="text.secondary">
+              ❮
+            </Typography>
           </IconButton>
-
-          {[1, 2, 3, 4, 5].map((num) => (
+          {[...Array(totalPages)].map((_, i) => (
             <Box
-              key={num}
+              key={i + 1}
               width={36}
               height={36}
               display="flex"
               alignItems="center"
               justifyContent="center"
               borderRadius="50%"
-              bgcolor={num === 1 ? "primary.main" : "transparent"}
-              color={num === 1 ? "#fff" : "text.primary"}
+              bgcolor={page === i + 1 ? "primary.main" : "transparent"}
+              color={page === i + 1 ? "#fff" : "text.primary"}
               sx={{
                 cursor: "pointer",
                 transition: "all 0.2s",
                 "&:hover": {
-                  bgcolor: num === 1 ? "primary.main" : "grey.100",
+                  bgcolor: page === i + 1 ? "primary.main" : "grey.100",
                 },
               }}
+              onClick={() => setPage(i + 1)}
             >
               <Typography fontSize="14px" fontWeight="bold">
-                {num}
+                {i + 1}
               </Typography>
             </Box>
           ))}
-
-          <IconButton>
-            <Typography fontSize="18px" color="text.secondary">❯</Typography>
+          <IconButton
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+          >
+            <Typography fontSize="18px" color="text.secondary">
+              ❯
+            </Typography>
           </IconButton>
         </Box>
       </Box>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MuiMenuItem onClick={() => { setOpenResetDialog(true); handleClose(); }}>
-          <LockResetIcon fontSize="small" sx={{ mr: 1 }} />
-          Cấp lại mật khẩu
+        <MuiMenuItem
+          onClick={() => {
+            setOpenResetDialog(true);
+            handleClose();
+          }}
+        >
+          <LockResetIcon fontSize="small" sx={{ mr: 1 }} /> Cấp lại mật khẩu
         </MuiMenuItem>
-        <MuiMenuItem onClick={() => { setOpenStatusDialog(true); setNewStatus(selectedUser?.status); handleClose(); }}>
-          <EditIcon fontSize="small" sx={{ mr: 1 }} />
-          Cập nhật trạng thái
-        </MuiMenuItem>
-        <MuiMenuItem onClick={() => { handleClose(); alert("Xóa người dùng") }}>
-          <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-          Xóa
+        <MuiMenuItem
+          onClick={() => {
+            setOpenStatusDialog(true);
+            setNewStatus(selectedUser?.status);
+            handleClose();
+          }}
+        >
+          <EditIcon fontSize="small" sx={{ mr: 1 }} /> Cập nhật trạng thái
         </MuiMenuItem>
       </Menu>
 
       <ResetPasswordDialog
         open={openResetDialog}
         onClose={() => setOpenResetDialog(false)}
-        onConfirm={() => {
-          alert(`✅ Mật khẩu mới đã được gửi cho ${selectedUser?.email}`);
-          setOpenResetDialog(false);
-        }}
+        onConfirm={handleResetPassword}
         user={selectedUser}
       />
 
       <UpdateStatusDialog
         open={openStatusDialog}
         onClose={() => setOpenStatusDialog(false)}
-        onConfirm={() => {
-          alert(`✅ Trạng thái của ${selectedUser?.name} đã được cập nhật`);
-          setOpenStatusDialog(false);
-        }}
+        onConfirm={handleUpdateStatus}
         user={selectedUser}
         newStatus={newStatus}
         setNewStatus={setNewStatus}

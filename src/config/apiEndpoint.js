@@ -56,3 +56,38 @@ export const API_ENDPOINT = {
     }
   }
 };
+const ADMIN_API_BASE_URL = "http://localhost:3000/admin";
+const CLIENT_API_BASE_URL = "http://localhost:3000";
+
+const apiEndpoints = {
+  user: {
+    list: `${ADMIN_API_BASE_URL}/user`,
+    resetPassword: (id) => `${ADMIN_API_BASE_URL}/user/${id}/reset-password`,
+    updateStatus: (id) => `${ADMIN_API_BASE_URL}/user/${id}/status`,
+    delete: (id) => `${ADMIN_API_BASE_URL}/user/${id}`,
+  },
+
+  comment: {
+    list: `${ADMIN_API_BASE_URL}/comment`,
+    create: `${ADMIN_API_BASE_URL}/comment`,
+    delete: (id) => `${ADMIN_API_BASE_URL}/comment/${id}`,
+    markSpam: (id) => `${ADMIN_API_BASE_URL}/comment/${id}/spam`,
+    summary: `${ADMIN_API_BASE_URL}/comment/summary`,
+    byProduct: (id) => `${ADMIN_API_BASE_URL}/comment/product/${id}`,
+  },
+
+  product: {
+    list: `${CLIENT_API_BASE_URL}/products`,
+    home: `${CLIENT_API_BASE_URL}/home-products`,
+    detail: (id) => `${CLIENT_API_BASE_URL}/products/${id}`, 
+    search: `${CLIENT_API_BASE_URL}/products/search`,
+
+  },
+  category: {
+    list: `${CLIENT_API_BASE_URL}/categories`,
+  }
+
+
+};
+
+export default apiEndpoints;

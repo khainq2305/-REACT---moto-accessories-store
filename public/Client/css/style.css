@@ -1462,3 +1462,112 @@ border-color: red green blue yellow */
 .other-footer-more {
     margin: 8px 10px 0;
 }
+.home-filter-sort {
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .home-filter-sort-btn {
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .home-filter-sort-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    width: 160px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    border-radius: 6px;
+    padding: 8px 0;
+    display: none;
+  }
+  
+  .home-filter-sort:hover .home-filter-sort-list {
+    display: block;
+  }
+  
+  .home-filter-sort-item-link {
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
+    background: none;
+    border: none;
+    outline: none;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  
+  .home-filter-sort-item-link:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .home-filter-sort-item-link.active {
+    font-weight: bold;
+    color: #20a162;
+    background-color: #eafaf2;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  
+  .pagination-item {
+    list-style: none;
+  }
+  
+  .pagination-item-link {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #333;
+    font-weight: 500;
+    text-align: center;
+    line-height: 34px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pagination-item-link:hover:not(:disabled) {
+    background-color: #f56c6c;
+    color: #fff;
+    border-color: #f56c6c;
+  }
+  
+  .pagination-item-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .pagination-item--active .pagination-item-link {
+    background-color: #ee4d2d;
+    color: #fff;
+    border-color: #ee4d2d;
+    font-weight: bold;
+  }
+
+  .search-results {
+    max-height: 500px;
+    overflow-y: auto;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  
