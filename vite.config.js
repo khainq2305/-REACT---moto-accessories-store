@@ -43,7 +43,7 @@ export default defineConfig({
     server: {
         proxy: {
           '/api': {
-            target: 'http://localhost:3001', // ✅ đúng là backend đang chạy port 3000
+            target: 'http://localhost:3000', 
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api/, ''),
           },
@@ -51,9 +51,7 @@ export default defineConfig({
       },
 
     
-    // plugins: [react(),svgr({
-    //   exportAsDefault: true
-    // })],
+    
 
     plugins: [svgr(), react()],
 });

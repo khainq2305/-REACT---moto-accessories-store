@@ -1,30 +1,31 @@
-import axios from 'axios';
+// src/services/userServices.js
+
 import apiEndpoints from '../config/apiEndpoint';
+import API from './common/api';
+import { UploadAPI } from './common/uploadAPI'; // ✅ Có interceptor riêng cho multipart
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:3000',
-});
-
+// ✅ Nếu có file (ảnh): dùng UploadAPI
 export const createUser = (formData) => {
-  return api.post(apiEndpoints.user.list, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  const hasImage = formData instanceof FormData && formData.has('avatar');
+  const client = hasImage ? UploadAPI : API;
+
+  return client.post(apiEndpoints.user.list, formData, {
+    headers: hasImage ? { 'Content-Type': 'multipart/form-data' } : {},
   });
 };
 
 export const getUsers = (params) => {
-  return api.get(apiEndpoints.user.list, { params });
+  return API.get(apiEndpoints.user.list, { params });
 };
 
 export const resetUserPassword = (id) => {
-  return api.patch(apiEndpoints.user.resetPassword(id));
+  return API.patch(apiEndpoints.user.resetPassword(id));
 };
 
 export const updateUserStatus = (id, status) => {
-  return api.patch(apiEndpoints.user.updateStatus(id), { status });
+  return API.patch(apiEndpoints.user.updateStatus(id), { status });
 };
 
 export const deleteUser = (id) => {
-  return api.delete(apiEndpoints.user.delete(id));
+  return API.delete(apiEndpoints.user.delete(id));
 };

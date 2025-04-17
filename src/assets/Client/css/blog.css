@@ -14,7 +14,10 @@
 
 .news-header h1 {
   font-size: 2.4rem;
-  color: #ff6600;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block; /* cần thiết để gradient hiển thị đúng */
   font-weight: bold;
   margin-bottom: 9px;
 }
@@ -63,7 +66,10 @@
 
 .news-title {
   font-size: 1.8rem;
-  color: #ff6600;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block; /* cần thiết để gradient hiển thị đúng */
   margin-bottom: 2px;
   transition: color 0.3s ease;
   overflow: hidden;
@@ -126,7 +132,10 @@
 .news-categories h3,
 .featured-news h3 {
   font-size: 1.8rem;
-  color: #ff6600;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
   margin-bottom: 15px;
 }
 
@@ -182,7 +191,10 @@
 }
 
 .featured-item div a:hover {
-  color: #ff6600;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block; /* cần thiết để gradient hiển thị đúng */
 }
 
 .featured-item div p {
@@ -218,7 +230,7 @@
 }
 
 .page-item.active {
-  background-color: #ff6600;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
   color: #fff;
   border: none;
 }

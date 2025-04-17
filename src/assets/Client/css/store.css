@@ -40,7 +40,10 @@
   }
   .store__sidebar-title {
     font-size: 1.2em;
-    color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
     margin-bottom: 15px;
     font-weight: bold;
   }
@@ -87,7 +90,10 @@
   }
   .store-card__name {
     font-size: 1.1em;
-    color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
     margin-bottom: 5px;
     font-weight: bold;
   }
@@ -97,7 +103,7 @@
     display: flex;
     justify-content: center;
     padding: 11px 30%;
-    background-color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
     color: #fff;
     font-size: 0.9em;
     text-decoration: none;
@@ -130,7 +136,10 @@
   }
   .store-card__feature i {
     margin-right: 19px;
-    color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
   }
   .store-card__share {
     display: flex;
@@ -148,14 +157,17 @@
     transition: color 0.3s;
   }
   .store-card__share i:hover {
-    color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
   }
   .store__see-more {
     text-align: center;
     margin-top: 20px;
   }
   .store__see-more-button {
-    background-color: #f53d2d;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -164,7 +176,7 @@
     border-radius: 5px;
   }
   .store__see-more-button:hover {
-    background-color: #aa7878;
+  opacity: 0.9;
   }
   .hidden {
     display: none;

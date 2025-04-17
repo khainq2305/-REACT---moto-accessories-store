@@ -1,172 +1,160 @@
 /* general */
-
 :root {
-    
-    --header-height: 120px;
-    --sort-bar-height: 46px;
-  
-    --white-color: white;
-    --black-color: black;
-    --text-color: #333;
-    --light-title-color: #999;
-    --primary-color: #ee4d2d;
-    --light-btn-primary-color: #fb5533;
-    --main-color1: #f53d2d;
-    --main-color2: #ff6633;
-    --border-color: lightcoral;
-    --hover-color: #eee;
-    --contain-color: #f5f5f5;
-    --footer-color: #777;
+    --header-height: 120px !important;
+    --sort-bar-height: 46px !important;
+
+    --white-color: white !important;
+    --black-color: black !important;
+    --text-color: #333 !important;
+    --light-title-color: #999 !important;
+    --primary-color: #ee4d2d !important;
+    --light-btn-primary-color: #fb5533 !important;
+    --main-color1: #f53d2d !important;
+    --main-color2: #ff6633 !important;
+    --border-color: lightcoral !important;
+    --hover-color: #eee !important;
+    --contain-color: #f5f5f5 !important;
+    --footer-color: #777 !important;
 }
 
-* {
-    box-sizing: border-box;
-}
+
 
 html {
-    font-size: 62.5%;
-    line-height: 1.6rem;
-    font-family: Helvetica, Arial, sans-serif;
-    box-sizing: border-box;
+ font-size: 62.5%;
+    line-height: 1.6rem !important;
+    font-family: Helvetica, Arial, sans-serif !important;
+    box-sizing: border-box !important;
 }
 
   
-body{
+body {
     font-size: 16px !important;
 }
+
 .grid__row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -5px;
-    margin-right: -5px;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin-left: -5px !important;
+    margin-right: -5px !important;
 }
 
 .grid__col-2 {
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 16.6667%;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    width: 16.6667% !important;
 }
 
 .grid__col-10 {
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 83.3333%;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    width: 83.3333% !important;
 }
 
 .grid__col-2_4 {
-    padding-left: 5px;
-    padding-right: 5px;
-    width: 20%;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+    width: 20% !important;
 }
 
 /* animation */
-
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0 !important; }
+    to   { opacity: 1 !important; }
 }
 
 @keyframes grow {
     from {
-        /* scale là độ lớn lên (kích thước = 0) */
-        transform: scale(0);
-        opacity: 0;
+        transform: scale(0) !important;
+        opacity: 0 !important;
     }
     to {
-        opacity: 1;
-        transform: scale(1);
+        opacity: 1 !important;
+        transform: scale(1) !important;
     }
 }
 
 /* modal */
-
 .modal {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    animation: fadeIn linear 0.3s;
-    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: fadeIn linear 0.3s !important;
+    display: none !important;
 }
 
 .modal__body {
-    animation: grow linear 0.3s;
+    animation: grow linear 0.3s !important;
 }
 
 /* button */
-
 .btn {
-    min-width: 142px;
-    height: 34px;
-    text-decoration: none;
-    border: none;
-    background-color: transparent;
-    outline: none;
-    cursor: pointer;
-    padding: 12px;
-    border-radius: 2px;
-    font-size: 1.4rem;
-    color: var(--text-color);
-    margin: 0 4px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    min-width: 142px !important;
+    height: 34px !important;
+    text-decoration: none !important;
+    border: none !important;
+    background-color: transparent !important;
+    outline: none !important;
+    cursor: pointer !important;
+    padding: 12px !important;
+    border-radius: 2px !important;
+    font-size: 1.4rem !important;
+    color: var(--text-color) !important;
+    margin: 0 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .btn.btn--primary {
-    color: var(--white-color);
-    background-color: var(--light-btn-primary-color);
+    color: var(--white-color) !important;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
 }
 
 .btn.btn-signin {
-    height: 32px;
-    font-size: 1.2rem;
+    height: 32px !important;
+    font-size: 1.2rem !important;
 }
 
 /* pagination */
-
 .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    list-style: none;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    list-style: none !important;
 }
 
 .pagination-item {
-    padding: 0 15px;
+    padding: 0 15px !important;
 }
 
 .pagination-item--active .pagination-item-link {
-    background-color: var(--primary-color);
-    color: var(--white-color);
+    background-color: var(--primary-color) !important;
+    color: var(--white-color) !important;
 }
 
 .pagination-item .pagination-item-link:hover {
-    box-shadow: 0 0 3px #333;
+    box-shadow: 0 0 3px #333 !important;
 }
 
 .pagination-item-link {
-    display: block;
-    text-decoration: none;
-    font-size: 1.8rem;
-    color: #999;
-    height: 30px;
-    text-align: center;
-    line-height: 30px;
-    min-width: 40px;
-    border-radius: 3px;
+    display: block !important;
+    text-decoration: none !important;
+    font-size: 1.8rem !important;
+    color: #999 !important;
+    height: 30px !important;
+    text-align: center !important;
+    line-height: 30px !important;
+    min-width: 40px !important;
+    border-radius: 3px !important;
 }
 
 .pagination-item .pagination-item-link--disable:hover {
-    cursor: default;
-    box-shadow: none;
+    cursor: default !important;
+    box-shadow: none !important;
 }

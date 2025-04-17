@@ -6,10 +6,11 @@ import {
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import CloseIcon from '@mui/icons-material/Close';
 import { useForm, Controller } from 'react-hook-form';
-import useToast from '../../components/Toast';
 import TinyEditor from '../../components/EDITOR/TinyEditor';
+import { toast } from 'react-toastify';
+import { categoriesService } from '../../services/categoryServices';
+
 const CategoryAdd = () => {
-  const toast = useToast();
   const fileInputRef = useRef();
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedFileName, setSelectedFileName] = useState('');
@@ -18,26 +19,41 @@ const CategoryAdd = () => {
     handleSubmit,
     control,
     setValue,
-
-    reset
+    reset,
+    formState: { errors },
   } = useForm({
     defaultValues: {
-      categoryName: '',
+      name: '',
       status: '',
       description: '',
-      image: null
-    }
+      image: null,
+    },
   });
 
+  const onSubmit = async (data) => {
+    if (!data.image) {
+      toast.error("Vui lòng chọn hình ảnh");
+      return;
+    }
 
+    try {
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('status', data.status);
+      formData.append('description', data.description);
+      formData.append('image', data.image);
 
-  const onSubmit = (data) => {
-    console.log(data);
-    toast('🎉 Thêm danh mục thành công!', 'success');
-    reset();
-    setSelectedImage(null);
-    setSelectedFileName('');
-    if (fileInputRef.current) fileInputRef.current.value = null;
+      const response = await categoriesService.AddCategories(formData);
+
+      toast.success('🎉 Thêm danh mục thành công!');
+      reset();
+      setSelectedImage(null);
+      setSelectedFileName('');
+      if (fileInputRef.current) fileInputRef.current.value = null;
+    } catch (error) {
+      console.error('Error adding category:', error);
+      toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
+    }
   };
 
   const handleImageChange = (e) => {
@@ -62,34 +78,49 @@ const CategoryAdd = () => {
       <CardHeader title="Thêm Danh Mục" sx={{ fontWeight: 'bold', pb: 0 }} />
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Tên danh mục */}
           <Box mb={3}>
             <Typography fontWeight={600} mb={1}>Tên Danh Mục</Typography>
             <Controller
-              name="categoryName"
+              name="name"
               control={control}
+              rules={{ required: 'Vui lòng nhập tên danh mục' }}
               render={({ field }) => (
-                <TextField {...field} fullWidth variant="outlined" placeholder="Tên danh mục" />
+                <TextField
+                  {...field}
+                  fullWidth
+                  variant="outlined"
+                  placeholder="Tên danh mục"
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
               )}
             />
           </Box>
 
+          {/* Trạng thái */}
           <Box mb={3}>
             <Typography fontWeight={600} mb={1}>Trạng thái</Typography>
-            <FormControl fullWidth>
-              <InputLabel>Chọn trạng thái</InputLabel>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
+            <Controller
+              name="status"
+              control={control}
+              rules={{ required: 'Vui lòng chọn trạng thái' }}
+              render={({ field }) => (
+                <FormControl fullWidth error={!!errors.status}>
+                  <InputLabel>Chọn trạng thái</InputLabel>
                   <Select {...field} label="Chọn trạng thái">
                     <MenuItem value="1">Hoạt động</MenuItem>
                     <MenuItem value="0">Không hoạt động</MenuItem>
                   </Select>
-                )}
-              />
-            </FormControl>
+                  <Typography variant="caption" color="error">
+                    {errors.status?.message}
+                  </Typography>
+                </FormControl>
+              )}
+            />
           </Box>
 
+          {/* Hình ảnh */}
           <Box mb={3}>
             <Typography fontWeight={600} mb={1}>Hình ảnh sản phẩm</Typography>
             <Box
@@ -111,7 +142,7 @@ const CategoryAdd = () => {
                 padding: 2,
                 textAlign: 'center',
                 cursor: 'pointer',
-                backgroundColor: '#fafafa'
+                backgroundColor: '#fafafa',
               }}
             >
               <CloudUploadIcon fontSize="large" color="action" />
@@ -142,7 +173,7 @@ const CategoryAdd = () => {
                     height: '80px',
                     objectFit: 'cover',
                     borderRadius: '5px',
-                    border: '1px solid #ccc'
+                    border: '1px solid #ccc',
                   }}
                 />
                 <IconButton
@@ -156,7 +187,7 @@ const CategoryAdd = () => {
                     color: 'white',
                     width: 20,
                     height: 20,
-                    '&:hover': { backgroundColor: '#c62828' }
+                    '&:hover': { backgroundColor: '#c62828' },
                   }}
                 >
                   <CloseIcon sx={{ fontSize: '14px' }} />
@@ -165,18 +196,27 @@ const CategoryAdd = () => {
             )}
           </Box>
 
+          {/* Mô tả */}
           <Box mb={3}>
             <Typography fontWeight={600} mb={1}>Mô tả danh mục</Typography>
             <Controller
               name="description"
               control={control}
+              rules={{ required: 'Vui lòng nhập mô tả' }}
               render={({ field }) => (
-                <TinyEditor value={field.value} onChange={field.onChange} />
+                <>
+                  <TinyEditor value={field.value} onChange={field.onChange} />
+                  {errors.description && (
+                    <Typography variant="caption" color="error">
+                      {errors.description.message}
+                    </Typography>
+                  )}
+                </>
               )}
             />
-
           </Box>
 
+          {/* Nút submit */}
           <Box mt={3} display="flex" gap={2}>
             <Button type="submit" variant="contained" color="primary">
               Thêm mới

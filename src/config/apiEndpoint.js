@@ -53,41 +53,37 @@ export const API_ENDPOINT = {
     category: {
       base: `${API_URL}/admin/categories`,
       list: '/list',
-    }
+      add: '/add',
+      getById: (id) => `/${id}`,
+      update: (id) => `/update/${id}`,
+      softDelete: (id) => `/soft-delete/${id}`,
+      listSoftDeleted: '/soft-delete/list',
+      restore: (id) => `/restore/${id}`,
+      restoreMultiple: '/restore/list',
+      permanentDelete: (id) => `/delete/${id}`,
+    },
+    user: {
+      base: `${API_URL}/admin/user`,
+      list: '',
+      resetPassword: (id) => `/${id}/reset-password`,
+      updateStatus: (id) => `/${id}/status`,
+      delete: (id) => `/${id}`,
+    },
+
+    comment: {
+      base: `${API_URL}/admin/comment`,
+      list: '',
+      create: '',
+      delete: (id) => `/${id}`,
+      markSpam: (id) => `/${id}/spam`,
+      summary: '/summary',
+      byProduct: (id) => `/product/${id}`,
+    },
+  
   }
 };
-const ADMIN_API_BASE_URL = "http://localhost:3000/admin";
-const CLIENT_API_BASE_URL = "http://localhost:3000";
-
-const apiEndpoints = {
-  user: {
-    list: `${ADMIN_API_BASE_URL}/user`,
-    resetPassword: (id) => `${ADMIN_API_BASE_URL}/user/${id}/reset-password`,
-    updateStatus: (id) => `${ADMIN_API_BASE_URL}/user/${id}/status`,
-    delete: (id) => `${ADMIN_API_BASE_URL}/user/${id}`,
-  },
-
-  comment: {
-    list: `${ADMIN_API_BASE_URL}/comment`,
-    create: `${ADMIN_API_BASE_URL}/comment`,
-    delete: (id) => `${ADMIN_API_BASE_URL}/comment/${id}`,
-    markSpam: (id) => `${ADMIN_API_BASE_URL}/comment/${id}/spam`,
-    summary: `${ADMIN_API_BASE_URL}/comment/summary`,
-    byProduct: (id) => `${ADMIN_API_BASE_URL}/comment/product/${id}`,
-  },
-
-  product: {
-    list: `${CLIENT_API_BASE_URL}/products`,
-    home: `${CLIENT_API_BASE_URL}/home-products`,
-    detail: (id) => `${CLIENT_API_BASE_URL}/products/${id}`, 
-    search: `${CLIENT_API_BASE_URL}/products/search`,
-
-  },
-  category: {
-    list: `${CLIENT_API_BASE_URL}/categories`,
-  }
 
 
-};
 
-export default apiEndpoints;
+export default API_ENDPOINT;
+

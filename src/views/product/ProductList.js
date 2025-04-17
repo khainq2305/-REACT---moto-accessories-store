@@ -36,12 +36,13 @@ const ProductList = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await productService.getCategories();
+      const res = await productService.getCategories({ status: 1 }); // 💥 thêm filter status = 1
       setCategories(res.data?.data || []);
     } catch (err) {
       console.error("❌ Lỗi fetchCategories:", err);
     }
   };
+  
 
   const fetchProducts = async () => {
     try {
@@ -77,9 +78,11 @@ const ProductList = () => {
   }, [searchText, selectedCategory, sortOrder, selectedDate, currentTab, statusFilter, currentPage]);
 
   const handleMenuClick = (e, product) => {
+    console.log("📌 Click mở menu cho:", product); // 👈 THÊM LOG
     setAnchorEl(e.currentTarget);
     setSelectedProduct(product);
   };
+  
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -93,7 +96,13 @@ const ProductList = () => {
   };
 
   const handleDelete = async () => {
-    console.log("👉 Gọi handleDelete cho ID:", selectedProduct?.id); // ⚠️ THÊM DÒNG NÀY
+    console.log("🚨 Gọi handleDelete cho:", selectedProduct);
+  
+    if (!selectedProduct) {
+      console.warn("⚠️ Không có sản phẩm nào được chọn");
+      return;
+    }
+  
     const result = await ConfirmDialog({
       title: "Xác nhận xóa",
       text: `Bạn có chắc chắn muốn xóa sản phẩm "${selectedProduct.name}"?`,
@@ -101,17 +110,21 @@ const ProductList = () => {
   
     if (result) {
       try {
+        console.log("🔧 Đang gửi API xóa sản phẩm ID:", selectedProduct.id);
         await productService.deleteProduct(selectedProduct.id);
-        toast.success("Đã chuyển sản phẩm vào thùng rác");
+        toast.success("✅ Đã chuyển sản phẩm vào thùng rác");
         fetchProducts();
       } catch (error) {
-        toast.error("Xóa thất bại");
-        console.error("🔥 Xóa thất bại:", error.response?.data || error.message);
+        console.error("❌ Xóa thất bại:", error.response?.data || error.message);
+        toast.error("❌ Xóa thất bại");
       }
+    } else {
+      console.log("❎ Hủy xóa sản phẩm");
     }
   
     handleMenuClose();
   };
+  
   
   
 
@@ -208,7 +221,13 @@ const ProductList = () => {
               <TableRow key={p.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
-                  <img src={`http://localhost:3000/uploads/${p.image}`} alt="" style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 4 }} />
+                <img
+  src={`http://localhost:3000/uploads/${p.image}`}
+  alt={p.name}
+  
+  style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 4 }}
+/>
+
                 </TableCell>
                 <TableCell>{p.name}</TableCell>
                 <TableCell>{p.price.toLocaleString()} ₫</TableCell>
@@ -230,29 +249,59 @@ const ProductList = () => {
         )}
       </TableContainer>
 
-      <PaginationComponent totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />
+      <Box mt={3} display="flex" justifyContent="center">
+  <PaginationComponent
+    totalPages={totalPages}
+    currentPage={currentPage}
+    onChange={setCurrentPage}
+  />
+</Box>
 
-      <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-        {currentTab !== "deleted" ? (
-          <div>
-            <MenuItem onClick={() => navigate(`/admin/products/edit/${selectedProduct?.id}`)}>
-              <Edit fontSize="small" sx={{ mr: 1 }} /> Chỉnh sửa
-            </MenuItem>
-            <MenuItem onClick={handleDelete}>
-              <Delete fontSize="small" sx={{ mr: 1 }} /> Xóa
-            </MenuItem>
-          </div>
-        ) : (
-          <div>
-            <MenuItem onClick={handleRestore}>
-              <Restore fontSize="small" sx={{ mr: 1 }} /> Khôi phục
-            </MenuItem>
-            <MenuItem onClick={handlePermanentDelete}>
-              <DeleteForever fontSize="small" sx={{ mr: 1 }} /> Xóa vĩnh viễn
-            </MenuItem>
-          </div>
-        )}
-      </Menu>
+
+<Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+  {currentTab !== "deleted" ? (
+    <div>
+      <MenuItem
+        onClick={() => {
+          console.log("📝 Click chỉnh sửa sản phẩm:", selectedProduct);
+          navigate(`/admin/products/edit/${selectedProduct?.id}`);
+        }}
+      >
+        <Edit fontSize="small" sx={{ mr: 1 }} /> Chỉnh sửa
+      </MenuItem>
+
+      <MenuItem
+        onClick={() => {
+          console.log("🗑 Click XÓA sản phẩm:", selectedProduct);
+          handleDelete();
+        }}
+      >
+        <Delete fontSize="small" sx={{ mr: 1 }} /> Xóa
+      </MenuItem>
+    </div>
+  ) : (
+    <div>
+      <MenuItem
+        onClick={() => {
+          console.log("♻️ Click KHÔI PHỤC sản phẩm:", selectedProduct);
+          handleRestore();
+        }}
+      >
+        <Restore fontSize="small" sx={{ mr: 1 }} /> Khôi phục
+      </MenuItem>
+
+      <MenuItem
+        onClick={() => {
+          console.log("🔥 Click XÓA VĨNH VIỄN sản phẩm:", selectedProduct);
+          handlePermanentDelete();
+        }}
+      >
+        <DeleteForever fontSize="small" sx={{ mr: 1 }} /> Xóa vĩnh viễn
+      </MenuItem>
+    </div>
+  )}
+</Menu>
+
     </Box>
   );
 };

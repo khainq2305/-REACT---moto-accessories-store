@@ -13,7 +13,7 @@ import '../../../assets/Client/css/about.css';
 import '../../../assets/Client/css/store.css';
 import '../../../assets/Client/css/blog.css';
 import '../../../assets/Client/css/contact.css';
-import '../../../assets/Client/css/search.css';
+
 import 'font-awesome/css/font-awesome.min.css';
 export default function ClientLayout() {
   return (

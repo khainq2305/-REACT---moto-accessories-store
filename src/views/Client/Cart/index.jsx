@@ -56,7 +56,8 @@ const CartPage = () => {
   const handleQuantityChange = async (index, delta) => {
     const updatedItems = [...cartItems];
     const item = updatedItems[index];
-    const stock = item.product?.stock || 1;
+    const stock = item.product?.quantity || 1;
+
     const newQuantity = item.quantity + delta;
   
     if (newQuantity < 1 || newQuantity > stock) return;
@@ -135,7 +136,8 @@ const CartPage = () => {
           {cartItems.map((item, idx) => {
             const price = parseFloat(item.product?.price) || 0;
             const discount = parseFloat(item.product?.discount) || 0;
-            const stock = item.product?.stock || 1;
+            const stock = item.product?.quantity || 1;
+
             const finalPrice = Math.max(0, price - discount);
 
             return (
@@ -174,12 +176,13 @@ const CartPage = () => {
                   <button className="cart-item__quantity-btn" onClick={() => handleQuantityChange(idx, -1)}>-</button>
                   <input type="text" value={item.quantity} readOnly className="cart-item__quantity-input" />
                   <button
-                    className="cart-item__quantity-btn"
-                    onClick={() => handleQuantityChange(idx, 1)}
-                    disabled={item.quantity >= stock}
-                  >
-                    +
-                  </button>
+  className="cart-item__quantity-btn"
+  onClick={() => handleQuantityChange(idx, 1)}
+  disabled={item.quantity >= stock}
+>
+  +
+</button>
+
                 </div>
                 <div className="cart-item__total">
                   {formatPrice(finalPrice * item.quantity)}

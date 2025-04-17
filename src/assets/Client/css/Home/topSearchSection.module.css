@@ -1,0 +1,95 @@
+.wrapper {
+    margin-top: 16px;
+    padding: 16px 0;
+    background-color: #f5f5f5;
+  }
+  
+  .inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 16px 0;
+  }
+  
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    row-gap: 16px;
+    column-gap: 0;
+  }
+  
+  .header {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+  }
+  
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
+    margin: 0;
+  }
+  
+  .viewAll {
+    font-size: 14px;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block; /* cần thiết để gradient hiển thị đúng */
+    text-decoration: none;
+  }
+  
+  .item {
+    text-align: center;
+    padding: 16px 8px;
+    border-right: 1px solid #f0f0f0;
+    border-top: 1px solid #f0f0f0; /* 👈 THÊM DÒNG NÀY */
+  }
+  
+  
+  .item:last-child {
+    border-right: none;
+  }
+  
+  .imageWrapper {
+    position: relative;
+    height: 140px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .imageWrapper img {
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  .topTag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* hoặc bất kỳ gradient nào */
+    color: white;
+    font-size: 12px;
+    padding: 2px 6px;
+    font-weight: bold;
+  }
+  
+  .sold {
+    background-color: #ccc;
+    font-size: 12px;
+    margin: 8px 0 4px;
+    padding: 2px;
+  }
+  
+  .name {
+    font-size: 14px;
+  }
+  

@@ -1,87 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import useToast from "../../components/Toast";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  InputAdornment,
-  Select,
-  MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Checkbox,
-  IconButton,
-  Menu,
-  Button,
-  useTheme,
-} from "@mui/material";
-
+import { Box, Card, CardContent, Typography, TextField, InputAdornment, Select, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Checkbox, IconButton, Menu, Button, useTheme } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-
 import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
+// ✅ Thêm ngay trong file component
+const API_IMAGE = import.meta.env.VITE_API_URL + "/uploads";
+const DEFAULT_IMAGE = "https://via.placeholder.com/80x80?text=No+Image";
 
-const initialData = [
-  {
-    id: 1,
-    uname: "Ốp pô xe",
-    imageUrl: "https://shop2banh.vn/images/thumbs/2024/05/tay-thang-cnc-cho-honda-wave-2303-slide-products-6646dbdfd57c6.JPG",
-    status: 1,
-    selected: false,
-    createdAt: "2024-03-01",
-  },
-  {
-    id: 2,
-    uname: "Đèn led",
-    imageUrl: "https://shop2banh.vn/images/thumbs/2024/09/tay-thang-gh-racing-cnc-cho-honda-lead-2361-slide-products-66f4d30b965ff.jpg",
-    status: 0,
-    selected: false,
-    createdAt: "2024-03-05",
-  },
-  {
-    id: 3,
-    uname: "Kính chắn gió",
-    imageUrl: "https://shop2banh.vn/images/thumbs/2022/07/dia-kingspeed-260mm-mau-moi-4-lo-products-1860.jpg",
-    status: 1,
-    selected: false,
-    createdAt: "2024-03-10",
-  },
-];
+import { toast } from "react-toastify";
+// Import the service to fetch categories
+import PaginationComponent from "../../components/Pagination";
+import { categoriesService } from "../../services/categoryServices";
+import { useNavigate } from 'react-router-dom';
 
 const CategoryPage = () => {
-  const toast = useToast();
   const navigate = useNavigate();
   const theme = useTheme();
-
   const [searchText, setSearchText] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [fromDate, setFromDate] = useState(null);
-  const [data, setData] = useState(initialData);
-  const [setTrash] = useState([]);
+  const [data, setData] = useState([]);
+  const [trash, setTrash] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
-  const [page] = useState(0);
-  const [rowsPerPage]= useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchCategories = async () => {
+    try {
+      const filters = {
+        page: currentPage,
+        search: searchText,
+        status: filterStatus !== "all" ? filterStatus : undefined,
+        fromDate: fromDate ? fromDate.toISOString().split('T')[0] : undefined
+      };
+      const response = await categoriesService.getAllCategories(filters);
+      setData(response.data?.data || []);
+      setTotalPages(response.data?.totalPages || 1);
+      setTrash(response.data?.trash || []);
+      console.log("Fetched categories:", response.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [currentPage, searchText, filterStatus, fromDate]);
 
   const handleSearchChange = (e) => {
     setSearchText(e.target.value.toLowerCase());
+    setCurrentPage(1); // Reset to first page on new search
   };
 
   const handleFilterChange = (e) => {
     setFilterStatus(e.target.value);
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
   const handleOpenMenu = (event, row) => {
@@ -102,13 +83,20 @@ const CategoryPage = () => {
   const handleDelete = () => {
     ConfirmDialog({
       title: "Xác nhận xóa",
-      text: `Bạn có chắc chắn muốn xóa "${menuRow?.uname}"?`,
-      onConfirm: () => {
-        setData((prev) => prev.filter((item) => item.id !== menuRow.id));
-        setTrash((prev) => [...prev, { ...menuRow, selected: false }]);
-        toast("Đã chuyển vào thùng rác", "info");
+      text: `Bạn có chắc chắn muốn xóa "${menuRow?.name}"?`,
+      onConfirm: async () => {
+        try {
+          await categoriesService.deleteCategories(menuRow.id);
+          setData((prev) => prev.filter((item) => item.id !== menuRow.id));
+          setTrash((prev) => [...prev, { ...menuRow, selected: false }]);
+          toast.success("Xóa thành công!");
+        } catch (error) {
+          toast.error("Xóa thất bại");
+          console.error("❌ Lỗi xoá:", error);
+        }
       },
     });
+
     handleCloseMenu();
   };
 
@@ -126,7 +114,8 @@ const CategoryPage = () => {
   };
 
   const filteredData = data.filter((item) => {
-    const matchText = item.uname.toLowerCase().includes(searchText);
+    const name = item.name ? item.name.toLowerCase() : "";
+    const matchText = name.includes(searchText.toLowerCase());
     const matchStatus = filterStatus === "all" || item.status.toString() === filterStatus;
     const matchDate = !fromDate || new Date(item.createdAt) >= new Date(fromDate);
     return matchText && matchStatus && matchDate;
@@ -137,7 +126,7 @@ const CategoryPage = () => {
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h5" fontWeight="bold">
-            📂 Danh sách các danh mục
+            Danh sách các danh mục
           </Typography>
           <Button
             variant="outlined"
@@ -186,7 +175,10 @@ const CategoryPage = () => {
             <DatePicker
               label="Lọc từ ngày tạo"
               value={fromDate}
-              onChange={(date) => setFromDate(date)}
+              onChange={(date) => {
+                setFromDate(date);
+                setCurrentPage(1); // Reset to first page when date changes
+              }}
               slotProps={{
                 textField: { size: "small", fullWidth: true },
               }}
@@ -200,13 +192,8 @@ const CategoryPage = () => {
               <TableCell padding="checkbox">
                 <Checkbox
                   onChange={handleSelectAll}
-                  checked={
-                    filteredData.length > 0 && filteredData.every((item) => item.selected)
-                  }
-                  indeterminate={
-                    filteredData.some((item) => item.selected) &&
-                    !filteredData.every((item) => item.selected)
-                  }
+                  checked={filteredData.length > 0 && filteredData.every((item) => item.selected)}
+                  indeterminate={filteredData.some((item) => item.selected) && !filteredData.every((item) => item.selected)}
                 />
               </TableCell>
               <TableCell>#</TableCell>
@@ -219,97 +206,67 @@ const CategoryPage = () => {
           </TableHead>
 
           <TableBody>
-            {filteredData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, i) => (
-                <TableRow key={row.id} hover>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={row.selected || false}
-                      onChange={() => handleSelectOne(row.id)}
-                    />
-                  </TableCell>
-                  <TableCell>{page * rowsPerPage + i + 1}</TableCell>
-                  <TableCell>
-                    <img
-                      src={row.imageUrl}
-                      alt={row.uname}
-                      width="80"
-                      height="80"
-                      style={{ objectFit: "cover", borderRadius: 8 }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography fontWeight={600} fontSize="16px">
-                      {row.uname}
-                    </Typography>
-                    <Typography fontSize="13px" color="text.secondary">
-                      Ngày tạo: {new Date(row.createdAt).toLocaleDateString("vi-VN")}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      {row.status === 1 ? (
-                        <>
-                          <CheckCircleIcon fontSize="small" sx={{ color: "#388e3c" }} />
-                          <Typography color="#388e3c" fontWeight={600}>Đang hoạt động</Typography>
-                        </>
-                      ) : (
-                        <>
-                          <CancelIcon fontSize="small" sx={{ color: "#d32f2f" }} />
-                          <Typography color="#d32f2f" fontWeight={600}>Dừng hoạt động</Typography>
-                        </>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">
-                    {Math.floor(Math.random() * 20)} sản phẩm
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton onClick={(e) => handleOpenMenu(e, row)}>
-                      <MoreVertIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+            {filteredData.map((row, i) => (
+              <TableRow key={row.id} hover>
+                <TableCell padding="checkbox">
+                  <Checkbox checked={row.selected || false} onChange={() => handleSelectOne(row.id)} />
+                </TableCell>
+                <TableCell>{(currentPage - 1) * 10 + i + 1}</TableCell>
+                <TableCell>
+                  <img
+                    src={`${API_IMAGE}/${row.imageUrl}`}
+                    alt={row.name}
+                    width="80"
+                    height="80"
+                    style={{ objectFit: "cover", borderRadius: 8 }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = `${DEFAULT_IMAGE}`;
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Typography fontWeight={600} fontSize="16px">
+                    {row.name}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    {row.status === 1 ? (
+                      <>
+                        <CheckCircleIcon fontSize="small" sx={{ color: "#388e3c" }} />
+                        <Typography color="#388e3c" fontWeight={600}>Đang hoạt động</Typography>
+                      </>
+                    ) : (
+                      <>
+                        <CancelIcon fontSize="small" sx={{ color: "#d32f2f" }} />
+                        <Typography color="#d32f2f" fontWeight={600}>Dừng hoạt động</Typography>
+                      </>
+                    )}
+                  </Box>
+                </TableCell>
+                <TableCell align="center">
+                  {row.productCount} sản phẩm
+                </TableCell>
+                <TableCell align="right">
+                  <IconButton onClick={(e) => handleOpenMenu(e, row)}>
+                    <MoreVertIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
 
-        <Box display="flex" justifyContent="center" gap={2} mt={4}>
-          <IconButton disabled>
-            <Typography fontSize="18px" color="text.secondary">❮</Typography>
-          </IconButton>
+        {data.length === 0 && (
+          <Typography textAlign="center" p={2}>Không có danh mục phù hợp</Typography>
+        )}
 
-          {[1, 2, 3, 4, 5].map((page) => (
-            <Box
-              key={page}
-              width={36}
-              height={36}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              borderRadius="50%"
-              bgcolor={page === 1 ? "primary.main" : "transparent"}
-              color={page === 1 ? "#fff" : "text.primary"}
-              sx={{
-                cursor: "pointer",
-                transition: "all 0.2s",
-                "&:hover": {
-                  bgcolor: page === 1 ? "primary.main" : "grey.100",
-                },
-              }}
-            >
-              <Typography fontSize="14px" fontWeight="bold">
-                {page}
-              </Typography>
-            </Box>
-          ))}
-
-          <IconButton>
-            <Typography fontSize="18px" color="text.secondary">❯</Typography>
-          </IconButton>
-        </Box>
-
+        <PaginationComponent
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onChange={setCurrentPage}
+        />
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
           <MenuItem onClick={handleEdit}>

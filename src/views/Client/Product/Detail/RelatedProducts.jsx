@@ -1,25 +1,29 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Row, Col, Image, Badge } from 'react-bootstrap';
+import { margin } from '@mui/system';
 
 const RelatedProducts = () => {
   return (
-    <div className="bg-white p-4 mt-4 rounded shadow-sm">
-    <div className="d-flex justify-content-between align-items-center mb-3">
-      <h2 className="fw-bold" style={{ fontSize: '20px', marginBottom: 0 }}>Các sản phẩm liên quan</h2>
-      <a
-        href="/tat-ca-san-pham"
-        className="btn btn-primary btn-sm d-flex align-items-center gap-1"
-        style={{ borderRadius: '4px' }}
-      >
-        Xem tất cả
-        <i className="fas fa-arrow-right"></i>
-      </a>
+    <div className="container-related-products">
 
-    </div>
+    <div className="bg-white p-4 mt-4">
+  
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="fw-bold" style={{ fontSize: '20px', marginBottom: 0 }}>Các sản phẩm liên quan</h2>
+        <a
+          href="/tat-ca-san-pham"
+          className="btn btn-primary btn-sm d-flex align-items-center gap-1"
+          style={{ borderRadius: '4px' }}
+        >
+          Xem tất cả
+          <i className="fas fa-arrow-right"></i>
+        </a>
+      </div>
+  
+      <div id="list-product" className="row sm-gutter">
+      <div className="col l-2  c-6 home-product-item">
 
-    <div id="list-product" className="row sm-gutter">
-      <div className="col l-2 m-3 c-6 home-product-item">
 
         <Link className="home-product-item-link" to="/product/1">
 
@@ -63,7 +67,7 @@ const RelatedProducts = () => {
           <div className="home-product-item-footer">Tìm sản phẩm tương tự</div>
         </Link>
       </div>
-      <div className="col l-2 m-3 c-6 home-product-item">
+      <div className="col l-2  c-6 home-product-item">
         <Link className="home-product-item-link" to="/product/1">
 
           <div
@@ -104,7 +108,7 @@ const RelatedProducts = () => {
           <div className="home-product-item-footer">Tìm sản phẩm tương tự</div>
         </Link>
       </div>
-      <div className="col l-2 m-3 c-6 home-product-item">
+      <div className="col l-2  c-6 home-product-item">
         <Link className="home-product-item-link" to="/product/1">
 
           <div
@@ -145,7 +149,7 @@ const RelatedProducts = () => {
           <div className="home-product-item-footer">Tìm sản phẩm tương tự</div>
         </Link>
       </div>
-      <div className="col l-2 m-3 c-6 home-product-item">
+      <div className="col l-2  c-6 home-product-item">
         <Link className="home-product-item-link" to="/product/1">
 
           <div
@@ -186,7 +190,7 @@ const RelatedProducts = () => {
           <div className="home-product-item-footer">Tìm sản phẩm tương tự</div>
         </Link>
       </div>
-      <div className="col l-2 m-3 c-6 home-product-item">
+      <div className="col l-2  c-6 home-product-item">
         <Link className="home-product-item-link" to="/product/1">
 
           <div
@@ -227,7 +231,7 @@ const RelatedProducts = () => {
           <div className="home-product-item-footer">Tìm sản phẩm tương tự</div>
         </Link>
       </div>
-      <div className="col l-2 m-3 c-6 home-product-item">
+      <div className="col l-2  c-6 home-product-item">
         <Link className="home-product-item-link" to="/product/1">
 
           <div
@@ -271,7 +275,9 @@ const RelatedProducts = () => {
 
 
     </div>
+    </div>
   </div>
+  
   );
 };
 

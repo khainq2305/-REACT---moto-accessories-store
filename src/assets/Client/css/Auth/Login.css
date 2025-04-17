@@ -1,5 +1,5 @@
 .login-page {
-  background-color: #f53d2d;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -26,18 +26,21 @@
 }
 
 .login-brand {
-  color: white;
+  color: #f1f1f1;
   text-align: center;
 }
 
 .login-brand img {
-  width: 100px;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
   margin-bottom: 10px;
 }
 
 .login-brand p {
   font-size: 20px;
   line-height: 1.6;
+  color: #ddd;
 }
 
 /* Right */
@@ -53,7 +56,7 @@
   background-color: white;
   padding: 40px;
   border-radius: 6px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   z-index: 10;
 }
 
@@ -108,8 +111,8 @@
 .text-danger {
   color: #f53d2d;
   font-size: 13px;
-  margin-top: 4px;     /* cách input 1 chút */
-  margin-bottom: 0;    /* không đẩy input dưới đi */
+  margin-top: 4px;
+  margin-bottom: 0;
   line-height: 1.4;
 }
 
@@ -118,7 +121,7 @@
   width: 100%;
   padding: 12px;
   margin-top: 7px;
-  background-color: #f53d2d;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
   color: white;
   border: none;
   border-radius: 4px;

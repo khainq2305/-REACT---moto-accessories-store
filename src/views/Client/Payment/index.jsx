@@ -224,45 +224,31 @@ const CheckoutPage = () => {
           <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Tóm tắt đơn hàng</h2>
 
           {selectedItems.map((item, index) => {
-            const price = parseFloat(item.product?.price) || 0;
-            const discount = parseFloat(item.product?.discount) || 0;
-            const finalPrice = Math.max(0, price - discount);
-            return (
-              <div className="order-item" key={index} style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
-                <div style={{ position: 'relative' }}>
-                  <img
-                    src={item.product.image}
-                    alt={item.product.name}
-                    style={{ width: '64px', height: '64px', borderRadius: '6px', objectFit: 'cover' }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    top: '-6px',
-                    right: '-6px',
-                    backgroundColor: '#555',
-                    color: '#fff',
-                    borderRadius: '50%',
-                    width: '20px',
-                    height: '20px',
-                    fontSize: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    {item.quantity}
-                  </div>
-                </div>
+  const price = parseFloat(item.product?.price) || 0;
+  const discount = parseFloat(item.product?.discount) || 0;
+  const finalPrice = Math.max(0, price - discount);
 
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: '500' }}>{item.product.name}</div>
-                </div>
+  return (
+    <div className="order-item-shopee" key={index}>
+      <div className="order-item-img-wrapper">
+        <img
+          src={item.product.image}
+          alt={item.product.name}
+          className="order-item-thumb"
+        />
+        <div className="order-item-qty-badge">{item.quantity}</div>
+      </div>
+      <div className="order-item-info">
+        <div className="order-item-name">{item.product.name}</div>
+        <div className="order-item-color">Black</div>
+      </div>
+      <div className="order-item-price">
+        {formatPrice(finalPrice * item.quantity)}
+      </div>
+    </div>
+  );
+})}
 
-                <div style={{ fontWeight: '500', whiteSpace: 'nowrap' }}>
-                  {formatPrice(finalPrice * item.quantity)}
-                </div>
-              </div>
-            );
-          })}
 
           <div className="subtotal-section" style={{ display: 'flex', justifyContent: 'space-between', margin: '8px 0' }}>
             <p className="order-summary-text">Tổng phụ</p>

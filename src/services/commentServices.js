@@ -1,12 +1,19 @@
-import axios from "axios";
-import apiEndpoints from "../../src/config/apiEndpoint";
+// src/services/commentServices.js
 
+import API from './common/api'; // ✅ dùng instance có interceptor
+import API_ENDPOINT from "../config/apiEndpoint"; // ✅ dùng default export
+
+
+
+// ✅ Lấy tổng quan đánh giá
 export const getCommentSummary = async () => {
-  const response = await axios.get(apiEndpoints.comment.summary);
+  const response = await API.get(API_ENDPOINT.admin.comment.base + API_ENDPOINT.admin.comment.summary);
+
   return response.data;
 };
 
+// ✅ Lấy đánh giá theo sản phẩm
 export const getCommentsByProduct = async (productId) => {
-  const response = await axios.get(apiEndpoints.comment.byProduct(productId));
+  const response = await API.get(API_ENDPOINT.comment.byProduct(productId));
   return response.data;
 };

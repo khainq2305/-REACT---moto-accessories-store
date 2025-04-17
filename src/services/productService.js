@@ -1,5 +1,8 @@
-import axios from 'axios';
+// ✅ IMPORT axios đã cấu hình
+import API from './common/api';
 import { API_ENDPOINT } from '../config/apiEndpoint';
+// 👉 Thêm sản phẩm mới (admin)
+import { UploadAPI } from './common/uploadAPI';
 
 // 👉 Gọi đúng base cho Admin và Client
 const adminBase = API_ENDPOINT.admin.product.base;
@@ -7,64 +10,77 @@ const clientBase = API_ENDPOINT.client.product.base;
 
 // 👉 Lấy danh sách sản phẩm (admin)
 export const getProductList = (filters = {}) => {
-  return axios.get(`${adminBase}${API_ENDPOINT.admin.product.list}`, { params: filters });
+  return API.get(`${adminBase}${API_ENDPOINT.admin.product.list}`, { params: filters });
 };
-// 👉 Thêm sản phẩm mới (admin)
+
+
 export const addProduct = (formData) => {
-  return axios.post(`${adminBase}${API_ENDPOINT.admin.product.add}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return UploadAPI.post(`${adminBase}${API_ENDPOINT.admin.product.add}`, formData);
+};
+
+export const updateProduct = (id, formData) => {
+  return UploadAPI.put(`${adminBase}/${id}`, formData); // ✅ CHUẨN
+};
+
+
+// 👉 Lấy danh sách sản phẩm (client)
+export const getAllProducts = (params = {}) => {
+  return API.get(`${clientBase}`, { params });
 };
 
 // 👉 Lấy chi tiết sản phẩm (client)
 export const getProductById = (id) => {
-  return axios.get(`${clientBase}/${id}`);
+  return API.get(`${clientBase}/${id}`);
 };
 
-// 👉 Admin - Xoá, khôi phục, xoá vĩnh viễn sản phẩm
+export const getFeaturedProducts = () => {
+  return API.get(`${clientBase}/featured`);
+};
+
+// 👉 Xóa sản phẩm
 export const deleteProduct = (id) => {
-  return axios.delete(`${adminBase}/delete/${id}`);
+  return API.delete(`${adminBase}/delete/${id}`);
 };
 
 export const deleteMultipleProducts = (ids) => {
-  return axios.delete(`${adminBase}${API_ENDPOINT.admin.product.deleteMultiple}`, { data: { ids } });
+  return API.delete(`${adminBase}${API_ENDPOINT.admin.product.deleteMultiple}`, { data: { ids } });
 };
 
 export const restoreProduct = (id) => {
-  return axios.patch(`${adminBase}${API_ENDPOINT.admin.product.restore}/${id}`);
+  return API.patch(`${adminBase}${API_ENDPOINT.admin.product.restore}/${id}`);
 };
 
 export const restoreMultipleProducts = (ids) => {
-  return axios.patch(`${adminBase}${API_ENDPOINT.admin.product.restoreMultiple}`, { ids });
+  return API.patch(`${adminBase}${API_ENDPOINT.admin.product.restoreMultiple}`, { ids });
 };
 
 export const permanentDeleteProduct = (id) => {
-  return axios.delete(`${adminBase}${API_ENDPOINT.admin.product.permanentDelete}/${id}`);
+  return API.delete(`${adminBase}${API_ENDPOINT.admin.product.permanentDelete}/${id}`);
 };
 
 export const permanentDeleteMultipleProducts = (ids) => {
-  return axios.delete(`${adminBase}${API_ENDPOINT.admin.product.permanentDeleteMultiple}`, { data: { ids } });
+  return API.delete(`${adminBase}${API_ENDPOINT.admin.product.permanentDeleteMultiple}`, { data: { ids } });
 };
 
-// 👉 Lấy danh mục (admin)
-export const getCategories = () => {
-  return axios.get(`${API_ENDPOINT.admin.category.base}${API_ENDPOINT.admin.category.list}`, {
-    params: { status: 1 },
+export const getCategories = (params = {}) => {
+  return API.get(`${API_ENDPOINT.admin.category.base}${API_ENDPOINT.admin.category.list}`, {
+    params,
   });
 };
 
-// ✅ Export service chuẩn
+
+// ✅ Export chuẩn
 export const productService = {
   getProductList,
   getProductById,
+  addProduct,
+  updateProduct, // 👈 THÊM
   deleteProduct,
   deleteMultipleProducts,
-  getCategories,
   restoreProduct,
   restoreMultipleProducts,
   permanentDeleteProduct,
   permanentDeleteMultipleProducts,
-  addProduct, // 👈 thêm dòng này vào!
+  getCategories,
+  getFeaturedProducts,
 };

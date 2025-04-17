@@ -8,35 +8,36 @@ const CartBox = () => {
   const [totalQty, setTotalQty] = useState(0);
 
   const fetchCart = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user?.id) return;
-
     try {
-      const res = await cartService.getCartByUser(user.id);
-      const items = res.data.data;
-      setCartItems(items);
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-      const total = items.reduce((acc, item) => acc + item.quantity, 0);
-      setTotalQty(total);
+      const { id } = JSON.parse(atob(token.split(".")[1])); // ✅ giống CartPage
+      const res = await cartService.getCartByUser(id);
+      const items = res.data.data?.filter((item) => item.product) || [];
+
+      setCartItems(items);
+      setTotalQty(items.reduce((acc, item) => acc + item.quantity, 0));
     } catch (error) {
       console.error("❌ Lỗi khi lấy giỏ hàng:", error);
     }
   };
 
+  useEffect(() => {
+    fetchCart();
+    window.addEventListener("storage", fetchCart); // khi localStorage thay đổi
+    return () => window.removeEventListener("storage", fetchCart);
+  }, []);
+
   const handleDelete = async (cartItemId) => {
     try {
       await cartService.deleteItem(cartItemId);
-      toast.success("Đã xóa sản phẩm khỏi giỏ");
-      fetchCart(); // Cập nhật lại danh sách sau khi xóa
+      toast.success("🗑️ Đã xóa sản phẩm khỏi giỏ");
+      fetchCart();
     } catch (error) {
-      toast.error("Xóa thất bại");
-      console.error("❌ Lỗi xóa:", error);
+      toast.error("❌ Xóa thất bại");
     }
   };
-
-  useEffect(() => {
-    fetchCart();
-  }, []);
 
   return (
     <div className="header__cart header__cart--has-cart">
@@ -59,7 +60,11 @@ const CartBox = () => {
             cartItems.map((item) => (
               <li className="header__cart-item" key={item.id}>
                 <img
-                  src={item.product.image}
+                  src={
+                    item.product.image
+                      ? `http://localhost:3000/uploads/${item.product.image}`
+                      : "https://via.placeholder.com/60x60?text=No+Image"
+                  }
                   className="header__cart-item-img"
                   alt={item.product.name}
                 />
@@ -87,7 +92,9 @@ const CartBox = () => {
         </ul>
 
         <div className="header__cart-footer">
-          <Link to="/cart" className="btn btn--primary header__cart-see-cart">Xem giỏ hàng</Link>
+          <Link to="/cart" className="btn btn--primary header__cart-see-cart">
+            Xem giỏ hàng
+          </Link>
         </div>
       </div>
 

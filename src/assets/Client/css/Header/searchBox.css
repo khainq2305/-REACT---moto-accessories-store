@@ -57,4 +57,46 @@
     opacity: 1;
     visibility: visible;
   }
-    
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+  }
+  
+  .search-result-item:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .result-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 12px;
+    border: 1px solid #eee;
+  }
+  
+  .result-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .result-name {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #007aff;
+  }
+  
+  .result-price {
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
