@@ -23,34 +23,24 @@ const TopSection = ({ product, quantity, setQuantity, error, setError, variants,
       {showToast && (
         <div style={{ position: 'fixed', top: '100px', right: '24px', zIndex: 9999 }}>
           <CustomToast
-            image={product.thumbnail}
-            name={product.name}
-            price={getFinalPrice()}
-            onClose={() => setShowToast(false)}
-          />
+  image={product.image} // ✅ sửa thành image
+  name={product.name}
+  price={getFinalPrice()}
+  onClose={() => setShowToast(false)}
+/>
+
         </div>
       )}
 
       <Row className="bg-white p-4 top-section">
         <Col md={5}>
-          <Image
-            src={product.thumbnail}
-            fluid
-            className="border mb-3"
-            alt={product.name}
-          />
-          <div className="d-flex justify-content-between">
-            {[...Array(5)].map((_, i) => (
-              <Image
-                key={i}
-                src={product.thumbnail}
-                thumbnail
-                width={90}
-                height={90}
-                alt="thumb"
-              />
-            ))}
-          </div>
+        <Image
+  src={product.image ? `http://localhost:3000/uploads/${product.image}` : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s'}
+  alt={product.name}
+  fluid
+  className="border mb-3"
+/>
+
         </Col>
 
         <Col md={7} className="text-start product-info">

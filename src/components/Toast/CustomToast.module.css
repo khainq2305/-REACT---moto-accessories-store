@@ -92,3 +92,20 @@
     width: 0%;
   }
 }
+.toast-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toast-old-price {
+  color: #888;
+  text-decoration: line-through;
+  font-size: 13px;
+}
+
+.toast-final-price {
+  color: #d0011b;
+  font-weight: bold;
+  font-size: 14px;
+}

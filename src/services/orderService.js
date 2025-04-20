@@ -17,10 +17,13 @@ export const adminOrderService = {
 };
 
 // ✅ CLIENT - ĐẶT HÀNG & XEM ĐƠN
+// ✅ CLIENT - ĐẶT HÀNG & XEM ĐƠN
 export const clientOrderService = {
   placeOrder: (data) =>
     API.post(`${API_ENDPOINT.client.order.base}${API_ENDPOINT.client.order.place}`, data),
 
-  getOrdersByUser: () =>
-    API.get(`${API_ENDPOINT.client.order.base}${API_ENDPOINT.client.order.getByUser}`),
+  getOrdersByUser: (params) =>
+    API.get(`${API_ENDPOINT.client.order.base}${API_ENDPOINT.client.order.getByUser}`, {
+      params,
+    }),
 };

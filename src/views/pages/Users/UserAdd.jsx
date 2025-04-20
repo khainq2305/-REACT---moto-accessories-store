@@ -10,10 +10,8 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  MenuItem,
   Radio,
   RadioGroup,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,14 +20,8 @@ import { toast } from "react-toastify";
 import { createUser } from "../../../services/userServices";
 import { useNavigate } from "react-router-dom";
 
-
-const userRoles = [
-  { value: 1, label: "Admin" },
-  { value: 0, label: "Người Dùng" },
-];
-
 const AddUserForm = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,9 +30,10 @@ const AddUserForm = () => {
     phone: "",
     gender: "",
     dob: "",
-    role: "",
+    role: "0", // luôn là người dùng
     status: "1",
   });
+
   const [avatar, setAvatar] = useState(null);
   const [errors, setErrors] = useState({});
 
@@ -60,6 +53,36 @@ const AddUserForm = () => {
     e.preventDefault();
     setErrors({});
 
+    const { email, password, dob } = formData;
+    const validationErrors = {};
+
+    // Validate email
+    if (!email?.trim()) validationErrors.email = "Email không được bỏ trống";
+    else if (!/^\S+@\S+\.\S+$/.test(email)) validationErrors.email = "Email không hợp lệ";
+
+    // Validate password
+    if (!password) validationErrors.password = "Mật khẩu không được bỏ trống";
+    else if (password.length < 6) validationErrors.password = "Mật khẩu phải từ 6 ký tự trở lên";
+
+    // Validate ngày sinh nếu có
+    if (dob) {
+
+      const today = new Date();
+      const age = today.getFullYear() - dobDate.getFullYear();
+      const monthDiff = today.getMonth() - dobDate.getMonth();
+
+      if (dobDate > today) {
+        validationErrors.dob = "Ngày sinh không được lớn hơn hiện tại";
+      } else if (age < 10 || (age === 10 && monthDiff < 0)) {
+        validationErrors.dob = "Người dùng phải từ 10 tuổi trở lên";
+      }
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     const data = new FormData();
     for (const key in formData) data.append(key, formData[key]);
     if (avatar) data.append("avatar", avatar);
@@ -67,7 +90,7 @@ const AddUserForm = () => {
     try {
       await createUser(data);
       toast.success("✨ Thêm người dùng thành công!");
-      navigate("/admin/users/userlist"); 
+      navigate("/admin/users/userlist");
       setFormData({
         name: "",
         email: "",
@@ -75,11 +98,12 @@ const AddUserForm = () => {
         phone: "",
         gender: "",
         dob: "",
-        role: "",
+        role: "0",
         status: "1",
       });
       setAvatar(null);
     } catch (err) {
+      console.log("🧨 Error khi tạo user:", err);
       if (err.response?.status === 400 && err.response.data.errors) {
         setErrors(err.response.data.errors);
       } else {
@@ -106,8 +130,6 @@ const AddUserForm = () => {
                 value={formData.name}
                 onChange={handleChange}
                 fullWidth
-                error={!!errors.name}
-                helperText={errors.name}
                 sx={{ mb: 2 }}
               />
               <TextField
@@ -127,8 +149,6 @@ const AddUserForm = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 fullWidth
-                error={!!errors.phone}
-                helperText={errors.phone}
                 sx={{ mb: 2 }}
               />
               <TextField
@@ -142,29 +162,6 @@ const AddUserForm = () => {
                 helperText={errors.password}
                 sx={{ mb: 2 }}
               />
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <Select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  displayEmpty
-                  error={!!errors.role}
-                >
-                  <MenuItem value="" disabled>
-                    Chọn cấp bậc
-                  </MenuItem>
-                  {userRoles.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.role && (
-                  <Typography variant="caption" color="error">
-                    {errors.role}
-                  </Typography>
-                )}
-              </FormControl>
             </Grid>
 
             <Grid item xs={12} md={6}>
@@ -178,27 +175,10 @@ const AddUserForm = () => {
                   value={formData.gender}
                   onChange={handleChange}
                 >
-                  <FormControlLabel
-                    value="male"
-                    control={<Radio />}
-                    label="Nam"
-                  />
-                  <FormControlLabel
-                    value="female"
-                    control={<Radio />}
-                    label="Nữ"
-                  />
-                  <FormControlLabel
-                    value="other"
-                    control={<Radio />}
-                    label="Khác"
-                  />
+                  <FormControlLabel value="male" control={<Radio />} label="Nam" />
+                  <FormControlLabel value="female" control={<Radio />} label="Nữ" />
+                  <FormControlLabel value="other" control={<Radio />} label="Khác" />
                 </RadioGroup>
-                {errors.gender && (
-                  <Typography variant="caption" color="error">
-                    {errors.gender}
-                  </Typography>
-                )}
               </FormControl>
 
               <TextField
@@ -222,22 +202,9 @@ const AddUserForm = () => {
                   value={formData.status}
                   onChange={handleChange}
                 >
-                  <FormControlLabel
-                    value="1"
-                    control={<Radio />}
-                    label="Hoạt động"
-                  />
-                  <FormControlLabel
-                    value="0"
-                    control={<Radio />}
-                    label="Không hoạt động"
-                  />
+                  <FormControlLabel value="1" control={<Radio />} label="Hoạt động" />
+                  <FormControlLabel value="0" control={<Radio />} label="Không hoạt động" />
                 </RadioGroup>
-                {errors.status && (
-                  <Typography variant="caption" color="error">
-                    {errors.status}
-                  </Typography>
-                )}
               </FormControl>
 
               <Typography fontWeight={500} mb={1}>
@@ -254,6 +221,9 @@ const AddUserForm = () => {
                   cursor: "pointer",
                   textAlign: "center",
                   mb: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <input {...getInputProps()} />
@@ -263,6 +233,7 @@ const AddUserForm = () => {
                     : "Kéo/thả tệp vào đây hoặc nhấn để chọn"}
                 </Typography>
               </Box>
+
               {avatar && (
                 <>
                   <Typography variant="body2" color="text.secondary">

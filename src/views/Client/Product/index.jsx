@@ -53,6 +53,8 @@ const ProductPage = () => {
           limit: 20,
         });
 
+  
+
         const productList = Array.isArray(res.data?.data)
           ? res.data.data
           : Array.isArray(res.data)
@@ -60,7 +62,7 @@ const ProductPage = () => {
           : [];
 
         setProducts(productList);
-        setTotalPages(res.totalPages || 1);
+        setTotalPages(res.data?.totalPages || 1); // ✅ TRUY CẬP ĐÚNG VỊ TRÍ
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (error) {
         console.error("❌ Lỗi khi lấy sản phẩm:", error);
@@ -140,14 +142,13 @@ const ProductPage = () => {
               <div className="row sm-gutter" id="list-product">
                 {products.map((item) => (
                   <div
-                  key={item.id}
-                  className="col"
-                  style={{
-                    flex: "0 0 20%",
-                    maxWidth: "20%",
-                  }}
-                >
-                
+                    key={item.id}
+                    className="col"
+                    style={{
+                      flex: "0 0 20%",
+                      maxWidth: "20%",
+                    }}
+                  >
                     <Link
                       to={`/product/${item.id}`}
                       className="home-product-item-link"
@@ -161,7 +162,7 @@ const ProductPage = () => {
                       <div className="home-product-item__info">
                         <h4 className="home-product-item__name">{item.name}</h4>
                         <div className="home-product-item__price">
-                          {item.finalPrice ? (
+                          {item.discount > 0 ? (
                             <>
                               <p className="home-product-item__price-old">
                                 {Number(item.price).toLocaleString("vi-VN")}đ
@@ -181,6 +182,7 @@ const ProductPage = () => {
 
                           <i className="home-product-item__ship fas fa-shipping-fast"></i>
                         </div>
+
                         <div className="home-product-item__footer">
                           <div className="home-product-item__save">
                             <input type="checkbox" id={`save-${item.id}`} />

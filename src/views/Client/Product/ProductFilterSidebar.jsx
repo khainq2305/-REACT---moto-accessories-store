@@ -18,22 +18,25 @@ const SidebarFilter = ({
           <div className="category-group">
             <div className="category-group-title">Theo Danh Mục</div>
             <ul className="category-group-list">
-              {(showAllCategories
-                ? categories
-                : categories.slice(0, MAX_CATEGORIES_DISPLAY)
-              ).map((category) => (
-                <li key={category.id} className="category-group-item">
-                  <input
-                    type="checkbox"
-                    value={category.id}
-                    className="category-group-item-check"
-                    id={`cat-${category.id}`}
-                    onChange={handleCategoryChange}
-                    checked={selectedCategories.includes(category.id)}
-                  />
-                  <label htmlFor={`cat-${category.id}`}>{category.name}</label>
-                </li>
-              ))}
+            {(Array.isArray(categories)
+  ? (showAllCategories
+      ? categories
+      : categories.slice(0, MAX_CATEGORIES_DISPLAY))
+  : []
+).map((category) => (
+  <li key={category.id} className="category-group-item">
+    <input
+      type="checkbox"
+      value={category.id}
+      className="category-group-item-check"
+      id={`cat-${category.id}`}
+      onChange={handleCategoryChange}
+      checked={selectedCategories.includes(category.id)}
+    />
+    <label htmlFor={`cat-${category.id}`}>{category.name}</label>
+  </li>
+))}
+
             </ul>
             {categories.length > MAX_CATEGORIES_DISPLAY && (
               <button

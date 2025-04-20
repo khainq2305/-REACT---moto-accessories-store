@@ -11,7 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { categoriesService } from '../../services/categoryServices';
-import { API_IMAGE, DEFAULT_IMAGE } from '../../config/apiEndpoint';
+const API_IMAGE = import.meta.env.VITE_API_URL + "/uploads";
+const DEFAULT_IMAGE = "http://localhost:3000/uploads/default.jpg";
 import { toast } from 'react-toastify';
 import PaginationComponent from '../../components/Pagination';
 
@@ -247,13 +248,16 @@ const CategoryTrash = () => {
           </Table>
         </Box>
 
-        {trashData.length > 0 && (
-          <PaginationComponent
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onChange={setCurrentPage}
-          />
-        )}
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  {trashData.length > 0 && (
+    <PaginationComponent
+      count={totalPages}
+      page={currentPage}
+      onChange={(event, value) => setCurrentPage(value)}
+      color="primary"
+    />
+  )}
+</CardContent>
 
         <Box mt={4} display="flex" justifyContent="space-between">
           <Button

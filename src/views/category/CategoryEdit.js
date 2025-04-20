@@ -11,8 +11,9 @@ import { useForm, Controller } from 'react-hook-form';
 import styles from './CategoryAdd.module.scss';
 import TinyEditor from '../../components/EDITOR/TinyEditor';
 import { categoriesService } from '../../services/categoryServices';
-import { API_IMAGE } from '../../config/apiEndpoint';
-
+import API_ENDPOINT from '../../config/apiEndpoint';
+const API_IMAGE = import.meta.env.VITE_API_URL + "/uploads";
+const DEFAULT_IMAGE = "http://localhost:3000/uploads/default.jpg";
 const CategoryEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const CategoryEdit = () => {
 
       await categoriesService.updateCategories(id, formData);
       toast.success('🎉 Cập nhật danh mục thành công!');
-      navigate('/category');
+      navigate(-1); // Quay lại trang trước đó
     } catch (err) {
       console.error('❌ Lỗi cập nhật danh mục:', err);
       toast.error('Cập nhật thất bại!');
@@ -265,12 +266,13 @@ const CategoryEdit = () => {
             <Button 
               variant="outlined" 
               color="error" 
-              onClick={() => navigate('/category')}
+              onClick={() => navigate(-1)}
+
             >
               Hủy
             </Button>
           </Box>
-        </form>
+        </form> 
       </CardContent>
     </Card>
   );

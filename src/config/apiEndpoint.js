@@ -30,6 +30,7 @@ export const API_ENDPOINT = {
       base: `${API_URL}`,
       login: '/login',
       register: '/register',
+      google: '/google', // ✅ thêm dòng này
     }
   },
 
@@ -64,11 +65,12 @@ export const API_ENDPOINT = {
     },
     user: {
       base: `${API_URL}/admin/user`,
-      list: '',
+      list: '', 
       resetPassword: (id) => `/${id}/reset-password`,
       updateStatus: (id) => `/${id}/status`,
       delete: (id) => `/${id}`,
     },
+    
 
     comment: {
       base: `${API_URL}/admin/comment`,
@@ -79,11 +81,14 @@ export const API_ENDPOINT = {
       summary: '/summary',
       byProduct: (id) => `/product/${id}`,
     },
+
+    
   
   }
 };
 
-
+export const API_IMAGE = import.meta.env.VITE_API_IMAGE_URL || "http://localhost:3001/uploads";
+export const DEFAULT_IMAGE = import.meta.env.VITE_DEFAULT_IMAGE || "http://localhost:3001/uploads/default.jpg";
 
 export default API_ENDPOINT;
 

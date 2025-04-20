@@ -40,9 +40,27 @@
   }
   
   .search-results {
+    max-height: 550px;
+    overflow-y: auto;
     font-size: 1.6rem;
     color: #333;
+    padding-right: 4px;
   }
+  
+  /* Tùy chọn: thanh cuộn đẹp hơn */
+  .search-results::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .search-results::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+  }
+  
+  .search-results::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+  
   .overlay-search {
     position: fixed;
     inset: 0;

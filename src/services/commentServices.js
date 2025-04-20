@@ -14,6 +14,7 @@ export const getCommentSummary = async () => {
 
 // ✅ Lấy đánh giá theo sản phẩm
 export const getCommentsByProduct = async (productId) => {
-  const response = await API.get(API_ENDPOINT.comment.byProduct(productId));
+  const url = API_ENDPOINT.admin.comment.base + API_ENDPOINT.admin.comment.byProduct(productId);
+  const response = await API.get(url);
   return response.data;
 };

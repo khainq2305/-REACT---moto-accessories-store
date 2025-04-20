@@ -1,42 +1,22 @@
-import { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { isTokenExpired } from "./tokenUtils";
-import { toast } from "react-toastify";
+import { Navigate, useLocation } from "react-router-dom";
 
 const AdminRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const location = useLocation();
-  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
+  // ❌ Nếu không có token hoặc user -> chuyển hướng
+  if (!token || !user) {
+    return <Navigate to="/auth" replace state={{ from: location }} />;
+  }
 
-    if (!token || !user) {
-      setIsAuthenticated(false);
-      navigate("/auth", { replace: true });
+  // ✅ Chỉ kiểm tra role là admin
+  if (user.role !== 1) {
+    return <Navigate to="/" replace />;
+  }
 
-      return;
-    }
-
-    if (isTokenExpired(token)) {
-      toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
-      localStorage.clear();
-      setIsAuthenticated(false);
-      navigate("/auth", { replace: true });
-
-      return;
-    }
-
-    if (user.role !== 1) {
-      navigate("/", { replace: true });
-      return;
-    }
-
-    // check lại mỗi lần chuyển trang
-  }, [location.pathname]);
-
-  return isAuthenticated ? children : null;
+  // ✅ Nếu pass => render component con
+  return children;
 };
 
 export default AdminRoute;

@@ -62,10 +62,8 @@ export const permanentDeleteMultipleProducts = (ids) => {
   return API.delete(`${adminBase}${API_ENDPOINT.admin.product.permanentDeleteMultiple}`, { data: { ids } });
 };
 
-export const getCategories = (params = {}) => {
-  return API.get(`${API_ENDPOINT.admin.category.base}${API_ENDPOINT.admin.category.list}`, {
-    params,
-  });
+export const getActiveCategories = () => {
+  return API.get(`${API_ENDPOINT.admin.category.base}/active`);
 };
 
 
@@ -81,6 +79,6 @@ export const productService = {
   restoreMultipleProducts,
   permanentDeleteProduct,
   permanentDeleteMultipleProducts,
-  getCategories,
+  getActiveCategories,
   getFeaturedProducts,
 };

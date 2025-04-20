@@ -301,8 +301,26 @@ const OrderList = () => {
           const order = orders.find((o) => o.id === selectedOrderId);
           if (!order) return toast.error("Không tìm thấy đơn hàng");
 
-          if ([2, 3, 4].includes(order.status)) return toast.error("Không thể hủy đơn hàng ở trạng thái hiện tại");
-          if (order.payment_status === "paid") return toast.error("Đơn đã thanh toán, không thể hủy");
+          if (order.status === 4) {
+            toast.error("Đơn đã bị hủy trước đó");
+            return;
+          }
+          
+          if (order.status === 3) {
+            toast.error("Đơn đã giao, không thể hủy");
+            return;
+          }
+          
+          if (order.status === 2) {
+            toast.error("Đơn đang giao, không thể hủy");
+            return;
+          }
+          
+          if (order.payment_status === "paid") {
+            toast.error("Đơn đã thanh toán, không thể hủy");
+            return;
+          }
+          
 
           setOpenCancel(true);
           handleMenuClose();

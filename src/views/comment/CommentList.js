@@ -26,6 +26,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useNavigate } from "react-router-dom";
 import { getCommentSummary } from "../../services/commentServices";
 import { toast } from "react-toastify";
+import PaginationComponent from "../../components/Pagination";
 
 const CommentList = () => {
   const navigate = useNavigate();
@@ -103,69 +104,70 @@ const CommentList = () => {
         }
       />
       <CardContent>
-      <Paper
-  elevation={0}
-  sx={{
-    p: 2,
-    mb: 3,
-    backgroundColor: "#f5f7fa",
-    borderRadius: 3,
-    boxShadow: "inset 0 0 5px rgba(0,0,0,0.05)",
-  }}
->
-  <Box
-    display="flex"
-    flexDirection={{ xs: "column", md: "row" }}
-    gap={2}
-    width="100%"
-  >
-    <TextField
-      fullWidth
-      placeholder="🔍 Tìm kiếm sản phẩm..."
-      variant="outlined"
-      size="small"
-      value={searchText}
-      onChange={(e) => setSearchText(e.target.value)}
-      sx={{
-        backgroundColor: "white",
-        borderRadius: 2,
-        "& .MuiOutlinedInput-root": {
-          borderRadius: 2,
-        },
-      }}
-      InputProps={{
-        startAdornment: (
-          <InputAdornment position="start">
-            <SearchIcon />
-          </InputAdornment>
-        ),
-      }}
-    />
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            mb: 3,
+            backgroundColor: "#f5f7fa",
+            borderRadius: 3,
+            boxShadow: "inset 0 0 5px rgba(0,0,0,0.05)",
+          }}
+        >
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={2}
+            width="100%"
+          >
+            <TextField
+              fullWidth
+              placeholder="Tìm kiếm sản phẩm..."
+              variant="outlined"
+              size="small"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              sx={{
+                backgroundColor: "white",
+                borderRadius: 2,
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                },
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-    <Select
-      fullWidth
-      value={sortOption}
-      onChange={(e) => setSortOption(e.target.value)}
-      size="small"
-      displayEmpty
-      sx={{
-        backgroundColor: "white",
-        borderRadius: 2,
-        "& .MuiOutlinedInput-notchedOutline": {
-          borderRadius: 2,
-        },
-      }}
-    >
-      <MenuItem value="default">🔁 Mặc định</MenuItem>
-      <MenuItem value="most-commented">💬 Bình luận nhiều nhất</MenuItem>
-      <MenuItem value="highest-rating">⭐ Sao cao nhất</MenuItem>
-      <MenuItem value="lowest-rating">⭐ Sao thấp nhất</MenuItem>
-      <MenuItem value="az">🔤 Tên A-Z</MenuItem>
-      <MenuItem value="za">🔡 Tên Z-A</MenuItem>
-    </Select>
-  </Box>
-</Paper>
-
+            <Select
+              fullWidth
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              size="small"
+              displayEmpty
+              sx={{
+                backgroundColor: "white",
+                borderRadius: 2,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderRadius: 2,
+                },
+              }}
+            >
+              <MenuItem value="default">🔁 Mặc định</MenuItem>
+              <MenuItem value="most-commented">
+                Bình luận nhiều nhất
+              </MenuItem>
+              <MenuItem value="highest-rating">⭐ Sao cao nhất</MenuItem>
+              <MenuItem value="lowest-rating">⭐ Sao thấp nhất</MenuItem>
+              <MenuItem value="az">Tên A-Z</MenuItem>
+              <MenuItem value="za">Tên Z-A</MenuItem>
+            </Select>
+          </Box>
+        </Paper>
 
         {loading ? (
           <Box textAlign="center" mt={5}>
@@ -175,12 +177,13 @@ const CommentList = () => {
             </Typography>
           </Box>
         ) : (
+          <>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>#</TableCell>
                 <TableCell align="center">Ảnh</TableCell>
-                <TableCell align="center">Sản phẩm</TableCell>
+                <TableCell >Sản phẩm</TableCell>
                 <TableCell align="center">Tổng bình luận</TableCell>
                 <TableCell align="center">Sao trung bình</TableCell>
                 <TableCell align="center">Hành động</TableCell>
@@ -197,7 +200,10 @@ const CommentList = () => {
                     <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                     <TableCell align="center">
                       <img
-                        src={item.imageUrl}
+                        src={
+                          item.imageUrl ||
+                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s"
+                        }
                         alt={item.productName}
                         width={100}
                         height={100}
@@ -206,13 +212,19 @@ const CommentList = () => {
                           objectFit: "cover",
                           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                         }}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src =
+                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s";
+                        }}
                       />
                     </TableCell>
-                    <TableCell align="center">
-                      <Typography fontWeight={600} fontSize={14}>
-                        {item.productName}
-                      </Typography>
-                    </TableCell>
+                    <TableCell>
+  <Typography fontWeight={600} fontSize={14}>
+    {item.productName}
+  </Typography>
+</TableCell>
+
                     <TableCell align="center">
                       <Typography fontWeight={500} color="primary">
                         {item.totalComments}
@@ -281,6 +293,12 @@ const CommentList = () => {
               )}
             </TableBody>
           </Table>
+          <PaginationComponent
+          totalPages={Math.ceil(getFilteredData().length / rowsPerPage)}
+          currentPage={page + 1}
+          onChange={(value) => setPage(value - 1)}
+        />
+         </>
         )}
       </CardContent>
     </Card>

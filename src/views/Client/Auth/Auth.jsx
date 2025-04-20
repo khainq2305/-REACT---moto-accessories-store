@@ -4,10 +4,13 @@ import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../../../services/authService";
 import "../../../assets/Client/css/Auth/Login.css";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true); // true = Login, false = Register
+  const [isLogin, setIsLogin] = useState(true);
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -16,6 +19,7 @@ const Auth = () => {
     formState: { errors },
   } = useForm();
 
+  // ✅ Login/Register thường
   const onSubmit = async (data) => {
     try {
       if (isLogin) {
@@ -27,11 +31,30 @@ const Auth = () => {
       } else {
         const res = await authService.registerUser(data);
         toast.success(res.data.message || "Đăng ký thành công!");
-        reset(); // clear form sau khi đăng ký
-        setIsLogin(true); // chuyển sang login sau khi đăng ký
+        reset();
+        setIsLogin(true);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Có lỗi xảy ra!");
+    }
+  };
+
+  // ✅ Đăng nhập Google
+  const handleGoogleLogin = async (credentialResponse) => {
+    try {
+      const credential = credentialResponse.credential;
+      const decoded = jwtDecode(credential);
+
+      const res = await authService.googleLogin(credential);
+      const { token, user } = res.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success("Đăng nhập Google thành công!");
+      navigate("/");
+    } catch (error) {
+      console.error("Lỗi đăng nhập Google:", error);
+      toast.error("Đăng nhập Google thất bại!");
     }
   };
 
@@ -130,21 +153,17 @@ const Auth = () => {
 
             <div className="login-or">HOẶC</div>
 
-            <div className="login-social">
-              <button className="fb">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/1024px-2023_Facebook_icon.svg.png"
-                  alt="fb"
-                />
-                Facebook
-              </button>
-              <button className="gg">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png"
-                  alt="gg"
-                />
-                Google
-              </button>
+            <div
+              className="gg"
+              style={{ padding: 0, width: "100%", minHeight: "40px" }}
+            >
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => toast.error("Google Login thất bại")}
+                theme="outline"
+                size="large"
+                width="100%"
+              />
             </div>
 
             <p className="login-register">

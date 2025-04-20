@@ -41,11 +41,7 @@ const AuthLayout = () => {
             />
           </Link>
 
-            <span
-              style={{ marginLeft: "12px", fontSize: "20px", color: "#222" }}
-            >
-              {isLoginPage ? "Đăng nhập" : "Đăng ký"}
-            </span>
+          
           </div>
 
           {/* Trợ giúp */}

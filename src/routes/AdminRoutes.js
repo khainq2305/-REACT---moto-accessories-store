@@ -33,7 +33,7 @@ const CategoryEdit = lazy(() => import("../views/category/CategoryEdit"));
 const CategoryTrash = lazy(() => import("../views/category/CategoryTrash"));
 
 // Comment
-const CommentList = lazy(() => import("../views/comment/commentList"));
+const CommentList = lazy(() => import("../views/comment/CommentList"));
 const CommentDetail = lazy(() => import("../views/comment/CommentDetail"));
 const CommentPage = lazy(() => import("../views/comment/CommentPage"));
 

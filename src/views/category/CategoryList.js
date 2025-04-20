@@ -10,9 +10,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-// ✅ Thêm ngay trong file component
 const API_IMAGE = import.meta.env.VITE_API_URL + "/uploads";
-const DEFAULT_IMAGE = "https://via.placeholder.com/80x80?text=No+Image";
+const DEFAULT_IMAGE = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s";
 
 import { toast } from "react-toastify";
 // Import the service to fetch categories
@@ -261,12 +260,14 @@ const CategoryPage = () => {
         {data.length === 0 && (
           <Typography textAlign="center" p={2}>Không có danh mục phù hợp</Typography>
         )}
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <PaginationComponent
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onChange={setCurrentPage}
+          />
+        </CardContent>
 
-        <PaginationComponent
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onChange={setCurrentPage}
-        />
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
           <MenuItem onClick={handleEdit}>

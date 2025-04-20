@@ -1,109 +1,182 @@
-// src/views/Client/Profile/OrderList.jsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import "../../../assets/Client/css/Profile/orderlist.css";
 import { clientOrderService } from "../../../services/orderService";
 
-import "../../../assets/Client/css/Profile/orderlist.css";
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("vi-VN", {
+    style: "decimal",
+    maximumFractionDigits: 0,
+  }).format(value);
 
-export default function OrderList() {
-  const [activeTab, setActiveTab] = useState("pending");
+const getReviewDeadline = (createdAt) => {
+  const created = new Date(createdAt);
+  const deadline = new Date(created.getTime() + 15 * 24 * 60 * 60 * 1000);
+  return deadline.toLocaleDateString("vi-VN");
+};
+
+const isReviewAvailable = (createdAt) => {
+  const now = new Date();
+  const created = new Date(createdAt);
+  return (now.getTime() - created.getTime()) / (1000 * 3600 * 24) <= 15;
+};
+
+const tabs = [
+  { label: "Tất cả", status: null },
+  { label: "Chờ xác nhận", status: 0 },
+  { label: "Đã xác nhận", status: 1 },
+  { label: "Đang giao", status: 2 },
+  { label: "Đã giao", status: 3 },
+  { label: "Đã huỷ", status: 4 },
+];
+
+const statusMap = {
+  0: { label: "CHỜ XÁC NHẬN", color: "text-danger" },
+  1: { label: "ĐÃ XÁC NHẬN", color: "text-danger" },
+  2: { label: "ĐANG GIAO", color: "text-danger" },
+  3: { label: "HOÀN THÀNH", color: "text-success" },
+  4: { label: "ĐÃ HUỶ", color: "text-danger" },
+};
+
+const OrderList = () => {
   const [orders, setOrders] = useState([]);
-
-  const tabs = [
-    { key: "pending", label: "Chờ xác nhận" },
-    { key: "confirmed", label: "Đã xác nhận" },
-    { key: "shipping", label: "Đang giao" },
-    { key: "delivered", label: "Đã giao" },
-    { key: "canceled", label: "Đã hủy" },
-  ];
-
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  const [selectedTab, setSelectedTab] = useState("Tất cả");
+  const [searchText, setSearchText] = useState("");
 
   const fetchOrders = async () => {
     try {
-        const res = await clientOrderService.getOrdersByUser();
+      const currentTab = tabs.find((t) => t.label === selectedTab);
+      const params =
+        currentTab?.status !== null ? { status: currentTab.status } : {};
 
-      setOrders(res.data.orders || []);
-    } catch (error) {
-      console.error("❌ Lỗi lấy danh sách đơn:", error);
+      const res = await clientOrderService.getOrdersByUser(params);
+      const ordersData = res?.data?.orders;
+
+      if (!Array.isArray(ordersData)) {
+        console.error("❌ Dữ liệu đơn hàng không hợp lệ:", res);
+        setOrders([]);
+        return;
+      }
+
+      const mapped = ordersData.map((order) => ({
+        ...order,
+        status: Number(order.status),
+      }));
+      setOrders(mapped);
+    } catch (err) {
+      console.error("❌ Lỗi khi lấy đơn hàng:", err);
+      setOrders([]);
     }
   };
 
+  useEffect(() => {
+    fetchOrders();
+  }, [selectedTab]);
+
+  const currentTab = tabs.find((t) => t.label === selectedTab);
+  const filteredOrders = orders
+    .filter(
+      (order) =>
+        currentTab?.status === null || order.status === currentTab.status
+    )
+    .filter((order) =>
+      order.orderDetails?.some((d) =>
+        d.product.name.toLowerCase().includes(searchText.toLowerCase())
+      )
+    );
+
   return (
     <div className="order-container">
-      {/* Tabs */}
       <ul className="order-tabs">
         {tabs.map((tab) => (
           <li
-            key={tab.key}
-            className={`order-tab ${activeTab === tab.key ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.key)}
+            key={tab.label}
+            className={`order-tabs__item ${
+              selectedTab === tab.label ? "active" : ""
+            }`}
+            onClick={() => setSelectedTab(tab.label)}
           >
             {tab.label}
           </li>
         ))}
       </ul>
 
-      {/* Search */}
       <div className="order-search-bar">
         <input
           type="text"
-          placeholder="Bạn có thể tìm kiếm theo tên Shop, ID đơn hàng hoặc Tên sản phẩm"
+          placeholder="Tìm theo tên sản phẩm..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
 
-      {/* Danh sách đơn hàng */}
-      {orders
-        .filter((order) => {
-          const statusMap = {
-            pending: 0,
-            confirmed: 1,
-            shipping: 2,
-            delivered: 3,
-            canceled: 4,
-          };
-          return order.status === statusMap[activeTab];
-        })
-        .map((order) => (
-          <div key={order.id} className="order-item">
-            <div className="order-status-bar">
-              <span className="text-success">Giao hàng thành công</span>
-              <span className="text-danger fw-600">HOÀN THÀNH</span>
+      {filteredOrders.map((order, i) => (
+        <div className="order-item" key={i}>
+          <div className="order-status-bar">
+            <div className="order-status-left">
+              <span className="label-love">Yêu thích</span>
+              <strong>Topick Global</strong>
+              <button className="btn btn-outline btn-chat">🗨 Chat</button>
+              <button className="btn btn-outline btn-shop">🛒 Xem Shop</button>
             </div>
-
-            {order.orderDetails.map((detail, idx) => (
-              <div key={idx} className="order-product-row">
-                <img
-                  src={detail.product?.image}
-                  alt="product"
-                  className="product-thumb"
-                />
-                <div className="product-main">
-                  <div className="product-title">{detail.product?.name}</div>
-                  <div className="product-sub">x{detail.quantity}</div>
-                </div>
-                <div className="product-price">
-                  <div className="price-old">
-                    ₫{(detail.price * 1.2).toLocaleString()}
-                  </div>
-                  <div className="price-new">₫{detail.price.toLocaleString()}</div>
-                </div>
-              </div>
-            ))}
-
-            <div className="product-total">
-              <span>Thành tiền: </span>
-              <span className="highlight">₫{order.total_price.toLocaleString()}</span>
-            </div>
-
-            <div className="order-action-row">
-              <button className="btn btn-primary">Đánh Giá</button>
-              <button className="btn btn-outline">Liên Hệ Người Bán</button>
-              <button className="btn btn-outline">Mua Lại</button>
+            <div className="order-status-right">
+              <span className="delivery-status">
+              </span>
+              <span className="order-status-label">
+                {statusMap[order.status]?.label || "Không rõ trạng thái"}
+              </span>
             </div>
           </div>
-        ))}
+
+          {order.orderDetails.map((detail, j) => (
+            <div className="order-product-row" key={j}>
+              <img
+                src={`http://localhost:3000/uploads/${detail.product.image}`}
+                alt="thumb"
+                className="product-thumb"
+              />
+              <div className="product-main">
+                <div className="product-title">{detail.product.name}</div>
+                <div className="product-sub">
+                  Phân loại hàng: {detail.variant || "Mặc định"}
+                </div>
+                <div className="product-sub">x{detail.quantity}</div>
+              </div>
+              <div className="product-price">
+                {detail.product.price !== detail.price &&
+                  detail.product.price &&
+                  !isNaN(detail.product.price) && (
+                    <span className="price-old">
+                      ₫{formatCurrency(detail.product.price)}
+                    </span>
+                  )}
+                <span className="price-new">
+                  ₫{formatCurrency(detail.price)}
+                </span>
+              </div>
+            </div>
+          ))}
+
+          <div className="product-total">
+            Thành tiền: <span className="highlight">₫{formatCurrency(order.total_price)}</span>
+          </div>
+
+          <div className="product-sub mt-2">
+            Đánh giá sản phẩm trước <span className="evaluate-date">{getReviewDeadline(order.createdAt)}</span>
+            <br />
+            <span className="evaluate-promo">Đánh giá ngay và nhận 200 Xu</span>
+          </div>
+
+          <div className="order-action-row">
+            {isReviewAvailable(order.createdAt) && (
+              <button className="btn btn-primary">Đánh Giá</button>
+            )}
+            <button className="btn btn-outline btn-refund">Yêu Cầu Trả Hàng/Hoàn Tiền</button>
+            <button className="btn btn-outline btn-more">Thêm</button>
+          </div>
+        </div>
+      ))}
     </div>
   );
-}
+};
+
+export default OrderList;

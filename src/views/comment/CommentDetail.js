@@ -23,7 +23,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-} from "@mui/material";
+} from "@mui/material"
+import PaginationComponent from "../../components/Pagination";
 
 import SearchIcon from "@mui/icons-material/Search";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -42,7 +43,8 @@ const CommentDetail = () => {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [anchorEl, setAnchorEl] = useState(null);
   const [menuRow, setMenuRow] = useState(null);
-  const [page] = useState(0);
+  const [page, setPage] = useState(0);
+
   const [rowsPerPage] = useState(5);
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -125,7 +127,7 @@ const CommentDetail = () => {
         >
           <TextField
             variant="outlined"
-            label="🔍 Tìm kiếm bình luận"
+            label="Tìm kiếm bình luận"
             size="small"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -242,44 +244,14 @@ const CommentDetail = () => {
           </TableBody>
         </Table>
 
-        <Box display="flex" justifyContent="center" gap={2} mt={4}>
-          <IconButton disabled>
-            <Typography fontSize="18px" color="text.secondary">
-              ❮
-            </Typography>
-          </IconButton>
+        <Box mt={4}>
+  <PaginationComponent
+    totalPages={Math.ceil(filteredData.length / rowsPerPage)}
+    currentPage={page + 1}
+    onChange={(value) => setPage(value - 1)}
+  />
+</Box>
 
-          {[1, 2, 3, 4, 5].map((page) => (
-            <Box
-              key={page}
-              width={36}
-              height={36}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              borderRadius="50%"
-              bgcolor={page === 1 ? "primary.main" : "transparent"}
-              color={page === 1 ? "#fff" : "text.primary"}
-              sx={{
-                cursor: "pointer",
-                transition: "all 0.2s",
-                "&:hover": {
-                  bgcolor: page === 1 ? "primary.main" : "grey.100",
-                },
-              }}
-            >
-              <Typography fontSize="14px" fontWeight="bold">
-                {page}
-              </Typography>
-            </Box>
-          ))}
-
-          <IconButton>
-            <Typography fontSize="18px" color="text.secondary">
-              ❯
-            </Typography>
-          </IconButton>
-        </Box>
 
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
           <MenuItem onClick={() => handleStartReply(menuRow)}>

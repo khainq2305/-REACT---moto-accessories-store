@@ -1,12 +1,31 @@
 import {
-  Box, Button, Chip, Grid, IconButton, InputAdornment,
-  Menu, MenuItem, Paper, Select, Stack, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, TextField,
-  Typography
+  Box,
+  Button,
+  Chip,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Menu,
+  MenuItem,
+  Paper,
+  Select,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
 } from "@mui/material";
 import {
-  Delete, Restore, Edit, DeleteForever, MoreVert,
-  Search as SearchIcon
+  Delete,
+  Restore,
+  Edit,
+  DeleteForever,
+  MoreVert,
+  Search as SearchIcon,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -36,14 +55,15 @@ const ProductList = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await productService.getCategories({ status: 1 }); // 💥 thêm filter status = 1
+      const res = await productService.getActiveCategories();
       setCategories(res.data?.data || []);
     } catch (err) {
       console.error("❌ Lỗi fetchCategories:", err);
+      setCategories([]); // fallback nếu lỗi
     }
   };
   
-
+  
   const fetchProducts = async () => {
     try {
       const filters = {
@@ -56,13 +76,20 @@ const ProductList = () => {
       };
 
       if (selectedDate) {
-        filters[currentTab === "deleted" ? "deletedAt" : "createdAt"] =
-          format(selectedDate, "yyyy-MM-dd");
+        filters[currentTab === "deleted" ? "deletedAt" : "createdAt"] = format(
+          selectedDate,
+          "yyyy-MM-dd"
+        );
       }
 
+     
       const res = await productService.getProductList(filters);
+console.log("📦 Dữ liệu mới sau xoá:", res.data.data);
+
       const data = res.data?.data || [];
-      setProducts(data.map(p => ({ ...p, finalPrice: p.price - p.discount })));
+      setProducts(
+        data.map((p) => ({ ...p, finalPrice: p.price - p.discount }))
+      );
       setTotalPages(res.data?.totalPages || 1);
     } catch (err) {
       console.error("❌ Lỗi fetchProducts:", err);
@@ -75,14 +102,21 @@ const ProductList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [searchText, selectedCategory, sortOrder, selectedDate, currentTab, statusFilter, currentPage]);
+  }, [
+    searchText,
+    selectedCategory,
+    sortOrder,
+    selectedDate,
+    currentTab,
+    statusFilter,
+    currentPage,
+  ]);
 
   const handleMenuClick = (e, product) => {
     console.log("📌 Click mở menu cho:", product); // 👈 THÊM LOG
     setAnchorEl(e.currentTarget);
     setSelectedProduct(product);
   };
-  
 
   const handleMenuClose = () => {
     setAnchorEl(null);
@@ -97,36 +131,29 @@ const ProductList = () => {
 
   const handleDelete = async () => {
     console.log("🚨 Gọi handleDelete cho:", selectedProduct);
-  
+
     if (!selectedProduct) {
       console.warn("⚠️ Không có sản phẩm nào được chọn");
       return;
     }
-  
+
     const result = await ConfirmDialog({
       title: "Xác nhận xóa",
       text: `Bạn có chắc chắn muốn xóa sản phẩm "${selectedProduct.name}"?`,
     });
-  
-    if (result) {
-      try {
-        console.log("🔧 Đang gửi API xóa sản phẩm ID:", selectedProduct.id);
-        await productService.deleteProduct(selectedProduct.id);
-        toast.success("✅ Đã chuyển sản phẩm vào thùng rác");
-        fetchProducts();
-      } catch (error) {
-        console.error("❌ Xóa thất bại:", error.response?.data || error.message);
-        toast.error("❌ Xóa thất bại");
-      }
-    } else {
-      console.log("❎ Hủy xóa sản phẩm");
-    }
-  
+
+    console.log("result ConfirmDialog:", result);
+if (result) {
+  console.log("BẮT ĐẦU GỌI XOÁ");
+  await productService.deleteProduct(selectedProduct.id);
+  toast.success("✅ Đã chuyển sản phẩm vào thùng rác");
+  fetchProducts();
+} else {
+  console.log("Người dùng huỷ xác nhận");
+}
+
     handleMenuClose();
   };
-  
-  
-  
 
   const handleRestore = async () => {
     await productService.restoreProduct(selectedProduct.id);
@@ -150,22 +177,26 @@ const ProductList = () => {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" mb={2}>Danh sách sản phẩm</Typography>
+      <Typography variant="h5" mb={2}>
+        Danh sách sản phẩm
+      </Typography>
 
       <Stack direction="row" spacing={1} mb={2}>
-        {["all", "active", "inactive", "deleted"].map(tab => (
+        {["all", "active", "inactive", "deleted"].map((tab) => (
           <Button
             key={tab}
             variant={currentTab === tab ? "contained" : "outlined"}
             color={tab === "deleted" ? "error" : "primary"}
             onClick={() => handleTabChange(tab)}
           >
-            {{
-              all: "Tất cả",
-              active: "Còn hàng",
-              inactive: "Hết hàng",
-              deleted: "Thùng rác"
-            }[tab]}
+            {
+              {
+                all: "Tất cả",
+                active: "Còn hàng",
+                inactive: "Hết hàng",
+                deleted: "Thùng rác",
+              }[tab]
+            }
           </Button>
         ))}
       </Stack>
@@ -173,27 +204,57 @@ const ProductList = () => {
       <Grid container spacing={2} mb={2}>
         <Grid item xs={12} sm={6} md={3}>
           <TextField
-            fullWidth size="small" label="Tìm kiếm"
+            fullWidth
+            size="small"
+            label="Tìm kiếm"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment> }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <Select fullWidth size="small" value={selectedCategory} displayEmpty onChange={(e) => setSelectedCategory(e.target.value)}>
+          <Select
+            fullWidth
+            size="small"
+            value={selectedCategory}
+            displayEmpty
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
             <MenuItem value="">Tất cả danh mục</MenuItem>
-            {categories.map((cat) => <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>)}
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </MenuItem>
+            ))}
           </Select>
         </Grid>
         <Grid item xs={6} md={2}>
-          <Select fullWidth size="small" value={sortOrder} displayEmpty onChange={(e) => setSortOrder(e.target.value)}>
+          <Select
+            fullWidth
+            size="small"
+            value={sortOrder}
+            displayEmpty
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
             <MenuItem value="">Sắp xếp</MenuItem>
             <MenuItem value="asc">Giá tăng dần</MenuItem>
             <MenuItem value="desc">Giá giảm dần</MenuItem>
           </Select>
         </Grid>
         <Grid item xs={6} md={2}>
-          <Select fullWidth size="small" value={statusFilter} displayEmpty onChange={(e) => setStatusFilter(e.target.value)}>
+          <Select
+            fullWidth
+            size="small"
+            value={statusFilter}
+            displayEmpty
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
             <MenuItem value="">Tất cả trạng thái</MenuItem>
             <MenuItem value="1">Còn hàng</MenuItem>
             <MenuItem value="0">Hết hàng</MenuItem>
@@ -222,86 +283,109 @@ const ProductList = () => {
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
                 <img
-  src={`http://localhost:3000/uploads/${p.image}`}
+  src={
+    p.image
+      ? `http://localhost:3000/uploads/${p.image}`
+      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s"
+  }
   alt={p.name}
-  
-  style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 4 }}
+  style={{
+    width: 60,
+    height: 60,
+    objectFit: "cover",
+    borderRadius: 4,
+  }}
+  onError={(e) => {
+    e.target.onerror = null;
+    e.target.src =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s";
+  }}
 />
 
                 </TableCell>
                 <TableCell>{p.name}</TableCell>
                 <TableCell>{p.price.toLocaleString()} ₫</TableCell>
-                <TableCell>{p.discount > 0 ? p.finalPrice.toLocaleString() + " ₫" : "—"}</TableCell>
+                <TableCell>
+                  {p.discount > 0 ? p.finalPrice.toLocaleString() + " ₫" : "—"}
+                </TableCell>
                 <TableCell>{p.category?.name}</TableCell>
                 <TableCell>{p.quantity}</TableCell>
                 <TableCell>
-                  <Chip label={p.status ? "Còn hàng" : "Hết hàng"} color={p.status ? "success" : "warning"} />
+                  <Chip
+                    label={p.status ? "Còn hàng" : "Hết hàng"}
+                    color={p.status ? "success" : "warning"}
+                  />
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(e) => handleMenuClick(e, p)}><MoreVert /></IconButton>
+                  <IconButton onClick={(e) => handleMenuClick(e, p)}>
+                    <MoreVert />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
         {products.length === 0 && (
-          <Typography textAlign="center" p={2}>Không có sản phẩm phù hợp</Typography>
+          <Typography textAlign="center" p={2}>
+            Không có sản phẩm phù hợp
+          </Typography>
         )}
       </TableContainer>
 
       <Box mt={3} display="flex" justifyContent="center">
-  <PaginationComponent
-    totalPages={totalPages}
-    currentPage={currentPage}
-    onChange={setCurrentPage}
-  />
-</Box>
+        <PaginationComponent
+          totalPages={totalPages}
+          currentPage={currentPage}
+          onChange={setCurrentPage}
+        />
+      </Box>
 
+      <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
+        {currentTab !== "deleted" ? (
+          <div>
+            <MenuItem
+              onClick={() => {
+                console.log("📝 Click chỉnh sửa sản phẩm:", selectedProduct);
+                navigate(`/admin/products/edit/${selectedProduct?.id}`);
+              }}
+            >
+              <Edit fontSize="small" sx={{ mr: 1 }} /> Chỉnh sửa
+            </MenuItem>
 
-<Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
-  {currentTab !== "deleted" ? (
-    <div>
-      <MenuItem
-        onClick={() => {
-          console.log("📝 Click chỉnh sửa sản phẩm:", selectedProduct);
-          navigate(`/admin/products/edit/${selectedProduct?.id}`);
-        }}
-      >
-        <Edit fontSize="small" sx={{ mr: 1 }} /> Chỉnh sửa
-      </MenuItem>
+            <MenuItem
+              onClick={() => {
+                console.log("🗑 Click XÓA sản phẩm:", selectedProduct);
+                handleDelete();
+              }}
+            >
+              <Delete fontSize="small" sx={{ mr: 1 }} /> Xóa
+            </MenuItem>
+          </div>
+        ) : (
+          <div>
+            <MenuItem
+              onClick={() => {
+                console.log("♻️ Click KHÔI PHỤC sản phẩm:", selectedProduct);
+                handleRestore();
+              }}
+            >
+              <Restore fontSize="small" sx={{ mr: 1 }} /> Khôi phục
+            </MenuItem>
 
-      <MenuItem
-        onClick={() => {
-          console.log("🗑 Click XÓA sản phẩm:", selectedProduct);
-          handleDelete();
-        }}
-      >
-        <Delete fontSize="small" sx={{ mr: 1 }} /> Xóa
-      </MenuItem>
-    </div>
-  ) : (
-    <div>
-      <MenuItem
-        onClick={() => {
-          console.log("♻️ Click KHÔI PHỤC sản phẩm:", selectedProduct);
-          handleRestore();
-        }}
-      >
-        <Restore fontSize="small" sx={{ mr: 1 }} /> Khôi phục
-      </MenuItem>
-
-      <MenuItem
-        onClick={() => {
-          console.log("🔥 Click XÓA VĨNH VIỄN sản phẩm:", selectedProduct);
-          handlePermanentDelete();
-        }}
-      >
-        <DeleteForever fontSize="small" sx={{ mr: 1 }} /> Xóa vĩnh viễn
-      </MenuItem>
-    </div>
-  )}
-</Menu>
-
+            <MenuItem
+              onClick={() => {
+                console.log(
+                  "🔥 Click XÓA VĨNH VIỄN sản phẩm:",
+                  selectedProduct
+                );
+                handlePermanentDelete();
+              }}
+            >
+              <DeleteForever fontSize="small" sx={{ mr: 1 }} /> Xóa vĩnh viễn
+            </MenuItem>
+          </div>
+        )}
+      </Menu>
     </Box>
   );
 };

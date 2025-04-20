@@ -41,7 +41,15 @@ const CartBox = () => {
 
   return (
     <div className="header__cart header__cart--has-cart">
-      <svg role="presentation" stroke="white" fill="white" strokeWidth="2" width="22" height="22" viewBox="0 0 22 22">
+      <svg
+        role="presentation"
+        stroke="white"
+        fill="white"
+        strokeWidth="2"
+        width="22"
+        height="22"
+        viewBox="0 0 22 22"
+      >
         <path
           d="M11 7H3.577A2 2 0 0 0 1.64 9.497l2.051 8A2 2 0 0 0 5.63 19H16.37a2 2 0 0 0 1.937-1.503l2.052-8A2 2 0 0 0 18.422 7H11Zm0 0V1"
           fill="none"
@@ -55,28 +63,42 @@ const CartBox = () => {
 
         <ul className="header__cart-list-item">
           {cartItems.length === 0 ? (
-            <p style={{ padding: "16px", color: "#888" }}>Chưa có sản phẩm nào</p>
+            <p style={{ padding: "16px", color: "#888" }}>
+              Chưa có sản phẩm nào
+            </p>
           ) : (
             cartItems.map((item) => (
               <li className="header__cart-item" key={item.id}>
                 <img
-                  src={
-                    item.product.image
-                      ? `http://localhost:3000/uploads/${item.product.image}`
-                      : "https://via.placeholder.com/60x60?text=No+Image"
-                  }
+                  src={`http://localhost:3000/uploads/${
+                    item.product.image ||
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s"
+                  }`}
                   className="header__cart-item-img"
                   alt={item.product.name}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5-I3nwE8w_QXqUKIaA9R5Rjr-l7UOVLdPWQ&s"; // fallback local
+                  }}
                 />
+
                 <div className="header__cart-item-info">
                   <div className="header__cart-item-heading">
-                    <h3 className="header__cart-item-name">{item.product.name}</h3>
+                    <h3 className="header__cart-item-name">
+                      {item.product.name}
+                    </h3>
                     <p className="header__cart-item-price">
-                      {(item.product.price - item.product.discount).toLocaleString()}đ
+                      {(
+                        item.product.price - item.product.discount
+                      ).toLocaleString()}
+                      đ
                     </p>
                   </div>
                   <div className="header__cart-item-body">
-                    <p className="header__cart-item-number">x {item.quantity}</p>
+                    <p className="header__cart-item-number">
+                      x {item.quantity}
+                    </p>
                     <div
                       className="header__cart-item-close"
                       onClick={() => handleDelete(item.id)}

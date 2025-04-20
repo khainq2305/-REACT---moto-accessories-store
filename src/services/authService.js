@@ -12,7 +12,13 @@ export const loginUser = (data) => {
   return API.post(`${base}${API_ENDPOINT.client.auth.login}`, data);
 };
 
+export const googleLogin = (token) => {
+  return API.post(`${base}${API_ENDPOINT.client.auth.google}`, { token });
+};
+
 export const authService = {
   registerUser,
   loginUser,
+  googleLogin, // ✅ thêm vào đây
 };
+
