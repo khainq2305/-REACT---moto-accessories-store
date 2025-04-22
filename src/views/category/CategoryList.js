@@ -79,25 +79,29 @@ const CategoryPage = () => {
     handleCloseMenu();
   };
 
-  const handleDelete = () => {
-    ConfirmDialog({
+  const handleDelete = async () => {
+    const isConfirmed = await ConfirmDialog({
       title: "Xác nhận xóa",
       text: `Bạn có chắc chắn muốn xóa "${menuRow?.name}"?`,
-      onConfirm: async () => {
-        try {
-          await categoriesService.deleteCategories(menuRow.id);
-          setData((prev) => prev.filter((item) => item.id !== menuRow.id));
-          setTrash((prev) => [...prev, { ...menuRow, selected: false }]);
-          toast.success("Xóa thành công!");
-        } catch (error) {
-          toast.error("Xóa thất bại");
-          console.error("❌ Lỗi xoá:", error);
-        }
-      },
     });
-
+  
+    if (isConfirmed) {
+      try {
+        await categoriesService.deleteCategories(menuRow.id);
+        setData((prev) => prev.filter((item) => item.id !== menuRow.id));
+        setTrash((prev) => [...prev, { ...menuRow, selected: false }]);
+        toast.success("Xóa thành công!");
+      } catch (error) {
+        toast.error(error.response?.data?.message || error.message);
+      }
+    }
+  
     handleCloseMenu();
   };
+  
+  
+  
+  
 
   const handleSelectAll = (e) => {
     const checked = e.target.checked;

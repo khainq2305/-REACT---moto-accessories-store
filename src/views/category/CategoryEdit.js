@@ -91,26 +91,31 @@ const CategoryEdit = () => {
 
   const onSubmit = async (data) => {
     try {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('status', data.status);
-      formData.append('description', data.description);
-      
-      // Nếu có file hình ảnh mới được chọn
-      if (data.image) {
-        formData.append('image', data.image);
-      }
+        if (!data.name || data.name.trim() === '') {
+            toast.error('Vui lòng nhập tên danh mục!');
+            return;
+        }
 
-      console.log('📦 FormData gửi lên:', [...formData.entries()]);
+        const formData = new FormData();
+        formData.append('name', data.name.trim());
+        formData.append('status', data.status);
+        formData.append('description', data.description);
 
-      await categoriesService.updateCategories(id, formData);
-      toast.success('🎉 Cập nhật danh mục thành công!');
-      navigate(-1); // Quay lại trang trước đó
-    } catch (err) {
-      console.error('❌ Lỗi cập nhật danh mục:', err);
-      toast.error('Cập nhật thất bại!');
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+
+        console.log('📦 FormData gửi lên:', [...formData.entries()]);
+
+        await categoriesService.updateCategories(id, formData);
+
+        toast.success('🎉 Cập nhật danh mục thành công!');
+        navigate(-1);
+    }catch (error) {
+      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra. Vui lòng thử lại!';
+      toast.error(errorMessage);
     }
-  };
+};
 
   if (isLoading) {
     return (
@@ -133,7 +138,19 @@ const CategoryEdit = () => {
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Vui lòng nhập tên danh mục' }}
+              rules={{
+                required: 'Vui lòng nhập tên danh mục',
+                maxLength: {
+                  value: 50,
+                  message: 'Tên danh mục không được vượt quá 50 ký tự',
+                },
+                pattern: {
+                  value: /^[\p{L}\p{N}\s\-+&()]+$/u, // Cho phép chữ, số, khoảng trắng, - + & ( )
+                  message: 'Tên danh mục chứa ký tự không hợp lệ',
+                },
+                validate: (value) =>
+                  value.trim() !== '' || 'Tên danh mục không được chỉ chứa khoảng trắng',
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}

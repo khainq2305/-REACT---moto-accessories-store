@@ -9,6 +9,8 @@ export const registerUser = (data) => {
 };
 
 export const loginUser = (data) => {
+  console.log("url  đây ",`${base}${API_ENDPOINT.client.auth.login}`)
+  console.log('base đây', `${base}` )
   return API.post(`${base}${API_ENDPOINT.client.auth.login}`, data);
 };
 

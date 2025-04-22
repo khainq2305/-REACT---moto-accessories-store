@@ -80,6 +80,7 @@ export const API_ENDPOINT = {
       markSpam: (id) => `/${id}/spam`,
       summary: '/summary',
       byProduct: (id) => `/product/${id}`,
+      checkCommentExists: (userId, productId) => `/check?product_id=${productId}&idUser=${userId}`,
     },
 
     
@@ -87,8 +88,8 @@ export const API_ENDPOINT = {
   }
 };
 
-export const API_IMAGE = import.meta.env.VITE_API_IMAGE_URL || "http://localhost:3001/uploads";
-export const DEFAULT_IMAGE = import.meta.env.VITE_DEFAULT_IMAGE || "http://localhost:3001/uploads/default.jpg";
+export const API_IMAGE = import.meta.env.VITE_API_IMAGE_URL || "http://localhost:3000/uploads";
+export const DEFAULT_IMAGE = import.meta.env.VITE_DEFAULT_IMAGE || "http://localhost:3000/uploads/default.jpg";
 
 export default API_ENDPOINT;
 

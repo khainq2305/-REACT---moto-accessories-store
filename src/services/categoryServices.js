@@ -20,6 +20,7 @@ export const getCategoriesById = (id) => {
 }
 
 export const updateCategories = (id, formData) => {
+  console.log("url cap nhat", `${API_ENDPOINT.admin.category.base}${API_ENDPOINT.admin.category.update(id)}`)
   return axios.put(`${API_ENDPOINT.admin.category.base}${API_ENDPOINT.admin.category.update(id)}`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",

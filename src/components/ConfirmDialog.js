@@ -13,6 +13,7 @@ const ConfirmDialog = ({ title, text }) => {
       cancelButtonText: "Hủy",
     }).then((result) => {
       resolve(result.isConfirmed); // ✅ Trả về true nếu xác nhận
+      console.log("🎯 Kết quả của SweetAlert2: ", result);
     });
   });
 };

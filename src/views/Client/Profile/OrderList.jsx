@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../../../assets/Client/css/Profile/orderlist.css";
 import { clientOrderService } from "../../../services/orderService";
-
+import ReviewModal from './ReviewModal'
 const formatCurrency = (value) =>
   new Intl.NumberFormat("vi-VN", {
     style: "decimal",
@@ -41,6 +41,19 @@ const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [selectedTab, setSelectedTab] = useState("Tất cả");
   const [searchText, setSearchText] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleCloseModal = () => setIsModalOpen(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
+
+  const handleOpenModal = (productId, userId) => {
+    
+    setSelectedProduct({ productId, userId });
+    console.log("ID người dùng là:", userId);
+    console.log("ID product là:", productId);
+    setIsModalOpen(true);
+  };
+
 
   const fetchOrders = async () => {
     try {
@@ -57,10 +70,16 @@ const OrderList = () => {
         return;
       }
 
-      const mapped = ordersData.map((order) => ({
-        ...order,
-        status: Number(order.status),
-      }));
+      console.log("Orders Data:", ordersData); // In log để kiểm tra cấu trúc
+
+      const mapped = ordersData.map((order) => {
+        console.log("➡️ Order:", order); // In log từng order
+        return {
+          ...order,
+          status: Number(order.status),
+          userId: order.idUser
+        };
+      });
       setOrders(mapped);
     } catch (err) {
       console.error("❌ Lỗi khi lấy đơn hàng:", err);
@@ -90,9 +109,8 @@ const OrderList = () => {
         {tabs.map((tab) => (
           <li
             key={tab.label}
-            className={`order-tabs__item ${
-              selectedTab === tab.label ? "active" : ""
-            }`}
+            className={`order-tabs__item ${selectedTab === tab.label ? "active" : ""
+              }`}
             onClick={() => setSelectedTab(tab.label)}
           >
             {tab.label}
@@ -123,6 +141,7 @@ const OrderList = () => {
               </span>
               <span className="order-status-label">
                 {statusMap[order.status]?.label || "Không rõ trạng thái"}
+
               </span>
             </div>
           </div>
@@ -140,7 +159,9 @@ const OrderList = () => {
                   Phân loại hàng: {detail.variant || "Mặc định"}
                 </div>
                 <div className="product-sub">x{detail.quantity}</div>
+
               </div>
+
               <div className="product-price">
                 {detail.product.price !== detail.price &&
                   detail.product.price &&
@@ -156,6 +177,7 @@ const OrderList = () => {
             </div>
           ))}
 
+          {/* Tổng đơn hàng và các hành động */}
           <div className="product-total">
             Thành tiền: <span className="highlight">₫{formatCurrency(order.total_price)}</span>
           </div>
@@ -167,15 +189,56 @@ const OrderList = () => {
           </div>
 
           <div className="order-action-row">
-            {isReviewAvailable(order.createdAt) && (
-              <button className="btn btn-primary">Đánh Giá</button>
+            <button className="btn btn-outline btn-refund">Yêu Cầu Trả Hàng/Hoàn Tiền</button>
+            <button className="btn btn-outline btn-more">Thêm</button>
+          </div>
+
+
+          <div className="product-total">
+            Thành tiền: <span className="highlight">₫{formatCurrency(order.total_price)}</span>
+          </div>
+
+          <div className="product-sub mt-2">
+            Đánh giá sản phẩm trước <span className="evaluate-date">{getReviewDeadline(order.createdAt)}</span>
+            <br />
+            <span className="evaluate-promo">Đánh giá ngay và nhận 200 Xu</span>
+          </div>
+
+          <div className="order-action-row">
+            {isReviewAvailable(order.createdAt) && order.orderDetails && order.orderDetails.length > 0 && (
+              <div className="review-buttons">
+                {/* Phương án 1: Nút đánh giá cho từng sản phẩm */}
+                {order.orderDetails.map((detail, index) => (
+                  <button 
+                    key={index}
+                    className="btn btn-primary bg-blue-500 text-danger px-4 py-2 rounded mr-2"
+                    onClick={() => {
+                      console.log("Product ID:",detail.idProduct) ;
+                      handleOpenModal(detail.idProduct,  order.userId);
+
+                    }}
+                  >
+                    Đánh Giá
+                    
+                  </button>
+                ))}
+                
+              </div>
             )}
             <button className="btn btn-outline btn-refund">Yêu Cầu Trả Hàng/Hoàn Tiền</button>
             <button className="btn btn-outline btn-more">Thêm</button>
           </div>
         </div>
       ))}
+      <ReviewModal
+        open={isModalOpen}
+        handleClose={handleCloseModal}
+        productId={selectedProduct?.productId}
+        userId={selectedProduct?.userId}
+      />
+
     </div>
+
   );
 };
 

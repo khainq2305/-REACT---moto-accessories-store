@@ -76,7 +76,7 @@ const ProductDetail = () => {
   
         <DescriptionSection />
   
-        <ReviewSection />
+        <ReviewSection productId={id} />
   
         <RelatedProducts />
       </Container>

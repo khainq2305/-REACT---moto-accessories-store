@@ -31,8 +31,8 @@ const CategoryAdd = () => {
   });
 
   const onSubmit = async (data) => {
-    if (!data.image) {
-      toast.error("Vui lòng chọn hình ảnh");
+    if (!data.image || !data.name || !data.status) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
       return;
     }
 
@@ -51,9 +51,10 @@ const CategoryAdd = () => {
       setSelectedFileName('');
       if (fileInputRef.current) fileInputRef.current.value = null;
     } catch (error) {
-      console.error('Error adding category:', error);
-      toast.error('Có lỗi xảy ra. Vui lòng thử lại!');
+      const errorMessage = error.response?.data?.error || 'Có lỗi xảy ra. Vui lòng thử lại!';
+      toast.error(errorMessage);
     }
+
   };
 
   const handleImageChange = (e) => {
@@ -84,7 +85,19 @@ const CategoryAdd = () => {
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Vui lòng nhập tên danh mục' }}
+              rules={{
+                required: 'Vui lòng nhập tên danh mục',
+                maxLength: {
+                  value: 50,
+                  message: 'Tên danh mục không được vượt quá 50 ký tự',
+                },
+                pattern: {
+                  value: /^[\p{L}\p{N}\s\-+&()]+$/u, // Cho phép chữ, số, khoảng trắng, - + & ( )
+                  message: 'Tên danh mục chứa ký tự không hợp lệ',
+                },
+                validate: (value) =>
+                  value.trim() !== '' || 'Tên danh mục không được chỉ chứa khoảng trắng',
+              }}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -96,6 +109,7 @@ const CategoryAdd = () => {
                 />
               )}
             />
+
           </Box>
 
           {/* Trạng thái */}

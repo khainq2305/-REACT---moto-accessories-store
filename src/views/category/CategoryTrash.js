@@ -49,38 +49,52 @@ const CategoryTrash = () => {
     fetchTrashData();
   }, [currentPage, searchText, sortOption, deleteDate]);
 
+  // const handleRestore = async (item) => {
+  //   ConfirmDialog({
+  //     title: 'Khôi phục danh mục',
+  //     text: `Bạn có chắc chắn muốn khôi phục "${item.name}"?`,
+  //   }
+  //     onConfirm: async () => {
+  //       try {
+  //         await categoriesService.restoreCategories(item.id);
+  //         await fetchTrashData();
+  //         toast.success(`Đã khôi phục "${item.name}"`);
+  //       } catch (error) {
+  //         toast.error(`Lỗi khi khôi phục "${item.name}"`);
+  //         console.error('Restore error:', error);
+  //       }
+  //     },
+  //   });
+  // };
   const handleRestore = async (item) => {
-    ConfirmDialog({
-      title: 'Khôi phục danh mục',
-      text: `Bạn có chắc chắn muốn khôi phục "${item.name}"?`,
-      onConfirm: async () => {
+     const isConfirmed = await ConfirmDialog({
+        title: 'Khôi phục danh mục',
+        text: `Bạn có chắc chắn muốn khôi phục "${item.name}"?`,
+      });
+      if(isConfirmed) {
         try {
           await categoriesService.restoreCategories(item.id);
           await fetchTrashData();
           toast.success(`Đã khôi phục "${item.name}"`);
         } catch (error) {
           toast.error(`Lỗi khi khôi phục "${item.name}"`);
-          console.error('Restore error:', error);
         }
-      },
-    });
-  };
-
+      }
+    };
   const handlePermanentDelete = async (item) => {
-    ConfirmDialog({
+    const isConfirmed = await ConfirmDialog({
       title: 'Xóa vĩnh viễn',
-      text: `Bạn có chắc muốn xóa vĩnh viễn "${item.name}"?`,
-      onConfirm: async () => {
-        try {
-          await categoriesService.permanentDeleteCategories(item.id);
-          await fetchTrashData();
-          toast.success(`Đã xóa vĩnh viễn "${item.name}"`);
-        } catch (error) {
-          toast.error(`Lỗi khi xóa vĩnh viễn "${item.name}"`);
-          console.error('Permanent delete error:', error);
-        }
-      },
+      text: `Bạn có chắc muốn xóa vĩnh viễn "${item.name}"?`
     });
+    if(isConfirmed) {
+      try {
+        await categoriesService.restoreCategories(item.id);
+        await fetchTrashData();
+        toast.success(`Đã khôi phục "${item.name}"`);
+      } catch (error) {
+        toast.error(`Lỗi khi khôi phục "${item.name}"`);
+      }
+    }
   };
 
   const handleSelectOne = (id) => {

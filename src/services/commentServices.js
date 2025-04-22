@@ -18,3 +18,19 @@ export const getCommentsByProduct = async (productId) => {
   const response = await API.get(url);
   return response.data;
 };
+
+export const createComment = async (commentData) => {
+  const { data } = await API.post(API_ENDPOINT.admin.comment.base + API_ENDPOINT.admin.comment.create, commentData);
+  return data;
+};
+export const getCommentsByProductAndUser = async (productId, userId) => {
+    return axios.get(`${API_URL}/comments`, {
+      params: { productId, userId },
+    });
+  }
+
+export const commentServices = {
+  createComment,
+  getCommentsByProductAndUser,
+  getCommentsByProduct
+}

@@ -119,7 +119,6 @@ const OrderList = () => {
       pending: "Chưa thanh toán",
       failed: "Thất bại",
     }[s] || "Không rõ");
-
   const handleCancel = async () => {
     const reason = cancelReason === "Khác" ? otherReason.trim() : cancelReason;
     if (!reason) {
@@ -271,7 +270,7 @@ const OrderList = () => {
                       variant="outlined"
                     />
                   </TableCell>
-                  <TableCell>{mapPayment(item.payment_status)}</TableCell>
+                  <TableCell>{mapPayment(item.payment_status)} đây là</TableCell>
                   <TableCell>
                     <IconButton onClick={(e) => handleMenuClick(e, item.id)}>
                       <MoreVert />
